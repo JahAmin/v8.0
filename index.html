@@ -1,0 +1,2790 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- METADADOS E TÍTULO -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Rebanho Leiteiro - Meu App Completo</title>
+
+    <!-- BIBLIOTECAS EXTERNAS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- ÍCONES (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+
+    <!-- ESTILOS -->
+    <style>
+        /* Copiado integralmente do estilo original (mantive todos os estilos e adicionei pequenos ajustes visuais para timeline e histórico) */
+        :root {
+            --primary-color: #28a745; /* Verde principal */
+            --secondary-color: #007bff; /* Azul secundário */
+            --accent-color: #ffc107; /* Amarelo de destaque/alerta */
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #343a40;
+            --danger-color: #dc3545;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .header h1 .ph {
+            margin-right: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* --- Navegação --- */
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .nav-link {
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            transition: all 0.2s;
+            background-color: white;
+            border: 1px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .nav-link .ph {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+        /* --- Seções da Página --- */
+        .page-section {
+            display: none;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        /* --- Cards --- */
+        .card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .card-header {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            margin-top: 1rem;
+        }
+
+        /* --- Dashboard Grid --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            text-align: center;
+            border-left: 5px solid var(--secondary-color);
+            padding: 1.5rem;
+        }
+
+        .metric-card.success {
+            border-left-color: var(--success-color);
+        }
+        .metric-card.warning {
+            border-left-color: var(--warning-color);
+        }
+        .metric-card.danger {
+            border-left-color: var(--danger-color);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--secondary-color);
+            line-height: 1;
+        }
+        .metric-card.success .metric-value { color: var(--success-color); }
+        .metric-card.warning .metric-value { color: var(--warning-color); }
+        .metric-card.danger .metric-value { color: var(--danger-color); }
+
+        .metric-label {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* --- Formulários e Botões --- */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        input:not([type="checkbox"]), select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .btn .ph {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #218838;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #0056b3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: var(--text-color);
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 0.8rem;
+            font-size: 0.875rem;
+        }
+
+        /* --- Tabela --- */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table th {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        /* --- Modal --- */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none; /* Controlado via JS */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--card-background);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--danger-color);
+        }
+
+        /* --- Alerta Personalizado (Global) --- */
+        .custom-alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .custom-alert-box {
+            background-color: var(--card-background);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+        
+        .custom-alert-overlay.show {
+            opacity: 1;
+        }
+        
+        .custom-alert-overlay.show .custom-alert-box {
+            transform: translateY(0);
+        }
+
+        .custom-alert-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .custom-alert-message {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .custom-alert-box.confirm .custom-alert-icon {
+            color: var(--warning-color);
+        }
+        
+        .custom-alert-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* --- Visualização do Animal --- */
+        .animal-view-data {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .animal-photo-container {
+            text-align: center;
+        }
+        
+        .animal-photo-container img {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border: 4px solid #e9ecef;
+        }
+
+        .animal-details dt {
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+        }
+        .animal-details dd {
+            margin-left: 0;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* Tabs para Visualização do Animal */
+        .animal-view-tabs {
+            display: flex;
+            gap: 10px;
+            margin-top: 1.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .animal-view-tab-btn {
+            padding: 10px 15px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .animal-view-tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .animal-view-tab-content {
+            padding: 1rem 0;
+            display: none;
+        }
+
+        /* Timeline (Histórico de Eventos) */
+        .timeline {
+            position: relative;
+            margin: 20px 0;
+            padding: 0;
+        }
+
+        .timeline:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e9ecef;
+            left: 20px;
+            margin-left: -1.5px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding-left: 50px;
+            min-height: 50px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            left: 13px;
+            top: 5px;
+            background: white;
+            border: 3px solid var(--secondary-color);
+            z-index: 1;
+        }
+        
+        .timeline-item.parto::before { border-color: var(--success-color); }
+        .timeline-item.cio::before { border-color: var(--warning-color); }
+        .timeline-item.cobertura::before { border-color: var(--info-color); }
+        .timeline-item.diagnostico::before { border-color: var(--primary-color); }
+        .timeline-item.morte::before { border-color: var(--danger-color); }
+
+        .timeline-date {
+            font-size: 0.8rem;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .timeline-content {
+            background: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-top: 5px;
+        }
+        
+        .timeline-content h4 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 1rem;
+            color: var(--secondary-color);
+        }
+
+        /* --- Tarefas (Lista) --- */
+        .tarefa-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tarefa-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--card-background);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 10px;
+            border-left: 5px solid var(--warning-color);
+        }
+
+        .tarefa-item.done {
+            border-left-color: var(--success-color);
+            opacity: 0.7;
+            text-decoration: line-through;
+            background-color: #e9f5e9;
+        }
+
+        .tarefa-info {
+            flex-grow: 1;
+        }
+
+        .tarefa-info strong {
+            display: block;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .tarefa-meta {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .tarefa-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Câmera/Foto Preview */
+        .camera-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+        .camera-container video, .camera-container canvas {
+            width: 100%;
+            max-width: 400px;
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
+        }
+        #foto-preview {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .nav {
+                justify-content: center;
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .animal-view-data {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1><i class="ph ph-cow"></i> Gerenciador de Rebanho Leiteiro</h1>
+        <div class="header-actions">
+             <button class="btn btn-warning btn-sm" id="btn-exportar-csv"><i class="ph ph-file-csv"></i> Exportar CSV</button>
+            <button class="btn btn-secondary btn-sm" id="btn-exportar-json"><i class="ph ph-export"></i> Exportar Dados (JSON)</button>
+            <button class="btn btn-info btn-sm" id="btn-importar-dados-modal"><i class="ph ph-import"></i> Importar Dados</button>
+            <button class="btn btn-danger btn-sm" id="reset-data-btn"><i class="ph ph-skull"></i> Resetar Tudo</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Navegação Principal -->
+        <nav class="nav">
+            <a href="#dashboard" class="nav-link active" data-section="dashboard"><i class="ph ph-chart-bar"></i> Dashboard</a>
+            <a href="#animais" class="nav-link" data-section="animais"><i class="ph ph-list-numbers"></i> Animais</a>
+            <a href="#producao" class="nav-link" data-section="producao"><i class="ph ph-bucket-simple"></i> Produção de Leite</a>
+            <a href="#saude" class="nav-link" data-section="saude"><i class="ph ph-calendar-check"></i> Saúde e Reprodução</a>
+            <a href="#config" class="nav-link" data-section="config"><i class="ph ph-gear-six"></i> Configurações</a>
+        </nav>
+
+        <!-- --- SEÇÕES DA PÁGINA --- -->
+
+        <!-- 1. DASHBOARD -->
+        <section id="dashboard" class="page-section active">
+            <h2 class="section-title">Dashboard</h2>
+
+            <div class="dashboard-grid">
+                <div class="card metric-card success">
+                    <div class="metric-value" id="total-animais">0</div>
+                    <div class="metric-label">Total de Animais</div>
+                </div>
+                <div class="card metric-card info">
+                    <div class="metric-value" id="vacas-lactacao">0</div>
+                    <div class="metric-label">Vacas em Lactação</div>
+                </div>
+                <div class="card metric-card warning">
+                    <div class="metric-value" id="tarefas-pendentes">0</div>
+                    <div class="metric-label">Tarefas Pendentes</div>
+                </div>
+                <div class="card metric-card primary">
+                    <div class="metric-value" id="producao-media-diaria">0 L</div>
+                    <div class="metric-label">Média Diária (Últimos 7 dias)</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+                <!-- Gráficos -->
+                <div class="card">
+                    <div class="card-header">Produção Diária (Últimas 4 Semanas)</div>
+                    <div class="card-body">
+                        <canvas id="producaoDiariaChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Próximas Tarefas -->
+                <div class="card">
+                    <div class="card-header">Próximas Tarefas</div>
+                    <div class="card-body">
+                        <ul class="tarefa-list" id="proximas-tarefas-lista">
+                            <!-- Lista de tarefas será injetada aqui -->
+                            <p class="text-secondary">Nenhuma tarefa pendente.</p>
+                        </ul>
+                        <button class="btn btn-primary btn-sm" onclick="showSection('saude')"><i class="ph ph-plus"></i> Gerenciar Tarefas</button>
+                    </div>
+                </div>
+
+                <!-- Próximos Eventos (Reprodução) -->
+                <div class="card" style="grid-column: 1 / -1;">
+                    <div class="card-header">Próximos Eventos de Reprodução</div>
+                    <div class="card-body">
+                        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                            <div>
+                                <h4 style="color:var(--danger-color);">Próximos Partos (30 dias)</h4>
+                                <ul class="tarefa-list" id="proximos-partos-lista">
+                                    <!-- Lista de partos será injetada aqui -->
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 style="color:var(--warning-color);">Próximos Cio (30 dias)</h4>
+                                <ul class="tarefa-list" id="proximos-cio-lista">
+                                    <!-- Lista de cio será injetada aqui -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Distribuição por Categoria -->
+                <div class="card" style="grid-column: 1 / -1;">
+                    <div class="card-header">Distribuição do Rebanho por Categoria</div>
+                    <div class="card-body" style="max-width: 500px; margin: 0 auto;">
+                        <canvas id="distribuicaoRebanhoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. ANIMAIS -->
+        <section id="animais" class="page-section">
+            <h2 class="section-title">Cadastro de Animais</h2>
+
+            <div class="card">
+                <div class="card-header">
+                    Lista de Animais
+                    <button class="btn btn-primary" id="btn-novo-animal" onclick="openAnimalForm()"><i class="ph ph-plus"></i> Novo Animal</button>
+                </div>
+                <div class="card-body">
+                    <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="busca-animal" placeholder="Buscar por ID ou Nome...">
+                        <select id="filtro-categoria">
+                            <option value="">Todas as Categorias</option>
+                            <option value="Vaca">Vaca</option>
+                            <option value="Novilha">Novilha</option>
+                            <option value="Bezerro(a)">Bezerro(a)</option>
+                            <option value="Boi">Boi</option>
+                        </select>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Categoria</th>
+                                    <th>Idade</th>
+                                    <th>Status Repr.</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="animal-list-tbody">
+                                <!-- Dados dos animais serão injetados aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. PRODUÇÃO DE LEITE -->
+        <section id="producao" class="page-section">
+            <h2 class="section-title">Registro de Produção de Leite</h2>
+
+            <div class="dashboard-grid">
+                <!-- Formulário de Registro de Leite -->
+                <div class="card">
+                    <div class="card-header">Registrar Produção Diária</div>
+                    <div class="card-body">
+                        <form id="leite-form">
+                            <div class="form-group">
+                                <label for="leite-data-input">Data:</label>
+                                <input type="date" id="leite-data-input" required>
+                            </div>
+                             <div class="form-group">
+                                <label for="leite-periodo-select">Período:</label>
+                                <select id="leite-periodo-select" required>
+                                    <option value="manha">Manhã</option>
+                                    <option value="tarde">Tarde</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="leite-vaca-select">Vaca (em Lactação):</label>
+                                <select id="leite-vaca-select" required>
+                                    <!-- População via JS -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="leite-quantidade-input">Quantidade (Litros):</label>
+                                <input type="number" id="leite-quantidade-input" step="0.1" min="0.1" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="ph ph-floppy-disk"></i> Salvar Produção</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Histórico de Produção (Lista) -->
+                 <div class="card">
+                    <div class="card-header">Últimos Registros de Leite</div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Vaca</th>
+                                        <th>Período</th>
+                                        <th>Litros</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leite-list-tbody">
+                                    <!-- Registros de leite serão injetados aqui -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. SAÚDE E REPRODUÇÃO (TAREFAS) -->
+        <section id="saude" class="page-section">
+            <h2 class="section-title">Saúde e Reprodução (Tarefas)</h2>
+
+            <div class="dashboard-grid" style="grid-template-columns: 1fr 2fr;">
+                <!-- Formulário de Tarefas -->
+                <div class="card">
+                    <div class="card-header">Registrar Nova Tarefa</div>
+                    <div class="card-body">
+                        <form id="tarefa-form">
+                            <div class="form-group">
+                                <label for="tarefa-animal-select">Animal:</label>
+                                <select id="tarefa-animal-select" required>
+                                    <!-- População via JS -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tarefa-tipo-select">Tipo de Tarefa/Evento:</label>
+                                <select id="tarefa-tipo-select" required>
+                                    <option value="vacina">Vacinação</option>
+                                    <option value="vermifugo">Vermifugação</option>
+                                    <option value="cio">Previsão de Cio</option>
+                                    <option value="parto">Previsão de Parto</option>
+                                    <option value="cobertura">Cobertura/Inseminação</option>
+                                    <option value="diagnostico">Diagnóstico de Gestação</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tarefa-data">Data Limite/Previsão:</label>
+                                <input type="date" id="tarefa-data" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tarefa-descricao">Detalhes:</label>
+                                <textarea id="tarefa-descricao" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="ph ph-plus"></i> Adicionar Tarefa</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Lista de Tarefas -->
+                <div class="card">
+                    <div class="card-header">Lista de Tarefas Pendentes</div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Animal</th>
+                                        <th>Tipo</th>
+                                        <th>Detalhes</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tarefa-list-tbody">
+                                    <!-- Tarefas serão injetadas aqui -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. CONFIGURAÇÕES -->
+        <section id="config" class="page-section">
+            <h2 class="section-title">Configurações e Manutenção</h2>
+
+            <div class="dashboard-grid" style="grid-template-columns: 1fr;">
+                <!-- Configurações Gerais -->
+                <div class="card">
+                    <div class="card-header">Configurações Gerais</div>
+                    <div class="card-body">
+                         <form id="id-prefix-form" class="form-inline">
+                            <div class="form-group" style="display: flex; gap: 10px; align-items: flex-end;">
+                                <div>
+                                    <label for="id-prefix-input">Prefixo de ID do Animal (1-5 letras):</label>
+                                    <input type="text" id="id-prefix-input" maxlength="5" placeholder="Ex: VACA" style="width: 150px;">
+                                </div>
+                                <button type="submit" class="btn btn-secondary"><i class="ph ph-floppy-disk"></i> Salvar Prefixo</button>
+                            </div>
+                             <p style="font-size: 0.9em; color: #6c757d;">Prefixo atual: <span id="current-id-prefix"></span></p>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Backup e Restauração -->
+                <div class="card">
+                    <div class="card-header">Backup e Restauração de Dados</div>
+                    <div class="card-body">
+                        <button class="btn btn-secondary" onclick="exportDataToJson()"><i class="ph ph-export"></i> Exportar Dados (JSON)</button>
+                        <p style="margin-top: 15px;">Importar Dados (Substitui TODOS os dados existentes):</p>
+                        <input type="file" id="input-importar-dados" accept=".json, .csv" style="width: auto; margin-right: 10px;">
+                        <button class="btn btn-danger" id="btn-importar-dados" disabled><i class="ph ph-import"></i> Importar/Restaurar</button>
+                        <button class="btn btn-warning" id="btn-importar-csv-modal"><i class="ph ph-file-csv"></i> Importar CSV</button>
+                    </div>
+                </div>
+                
+                <!-- Relatórios -->
+                <div class="card">
+                    <div class="card-header">Relatórios</div>
+                    <div class="card-body">
+                        <button class="btn btn-info" id="btn-gerar-relatorio-pdf"><i class="ph ph-file-pdf"></i> Gerar Relatório PDF</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- --- MODAIS (Janelas Flutuantes) --- -->
+
+        <!-- Modal de Cadastro/Edição de Animal -->
+        <div id="modal-animal-form" class="modal">
+            <div class="modal-content">
+                <span class="modal-close" onclick="document.getElementById('modal-animal-form').style.display='none'">&times;</span>
+                <h3 style="color:var(--secondary-color);">Formulário de Animal</h3>
+                <form id="animal-form">
+                    <input type="hidden" id="animal-id">
+
+                    <div class="form-group">
+                        <label for="animal-nome">Nome/Identificação:</label>
+                        <input type="text" id="animal-nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="animal-raca">Raça:</label>
+                        <input type="text" id="animal-raca" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="animal-categoria-select">Categoria:</label>
+                        <select id="animal-categoria-select" required>
+                            <option value="">Selecione...</option>
+                            <option value="Vaca">Vaca</option>
+                            <option value="Novilha">Novilha</option>
+                            <option value="Bezerro(a)">Bezerro(a)</option>
+                            <option value="Boi">Boi</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="animal-peso">Peso (Kg):</label>
+                        <input type="number" id="animal-peso" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="animal-data-nasc">Data de Nascimento:</label>
+                        <input type="date" id="animal-data-nasc" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="animal-data-aquisicao">Data de Aquisição:</label>
+                        <input type="date" id="animal-data-aquisicao">
+                    </div>
+
+                    <!-- Campos Condicionais para Vacas/Novilhas -->
+                    <div id="vaca-fields" style="display: none; border-top: 1px dashed #ccc; padding-top: 10px; margin-top: 10px;">
+                        <h4>Detalhes de Reprodução</h4>
+                        <div class="form-group">
+                            <label for="animal-status-reprodutivo">Status Reprodutivo:</label>
+                            <select id="animal-status-reprodutivo" required>
+                                <option value="Vazia">Vazia</option>
+                                <option value="Prenhe">Prenhe</option>
+                                <option value="Em Lactação">Em Lactação</option>
+                                <option value="Seca">Seca</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="animal-data-ultimo-parto">Data Último Parto:</label>
+                            <input type="date" id="animal-data-ultimo-parto">
+                        </div>
+                        <div class="form-group">
+                            <label for="animal-data-secagem">Data de Secagem (Prevista/Real):</label>
+                            <input type="date" id="animal-data-secagem">
+                        </div>
+                        <div class="form-group">
+                            <label for="animal-data-previsao-parto">Data Prevista do Próximo Parto:</label>
+                            <input type="date" id="animal-data-previsao-parto">
+                        </div>
+                    </div>
+                    
+                    <!-- Campo de Foto -->
+                    <div class="form-group">
+                        <label for="animal-foto-input">Foto do Animal:</label>
+                        <div class="camera-container">
+                            <input type="file" id="animal-foto-input" accept="image/*" onchange="previewFoto(event)">
+                            <img id="foto-preview" src="" alt="Preview da Foto" style="display: none;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="capturarImagem()"><i class="ph ph-camera"></i> Capturar com Câmera</button>
+                            <video id="camera-video" style="display: none;" autoplay></video>
+                            <canvas id="camera-canvas" style="display: none;"></canvas>
+                            <button type="button" class="btn btn-info btn-sm" id="btn-tirar-foto" style="display: none;"><i class="ph ph-aperture"></i> Tirar Foto</button>
+                            <button type="button" class="btn btn-danger btn-sm" id="btn-cancelar-camera" style="display: none;"><i class="ph ph-x-circle"></i> Cancelar Câmera</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="margin-top: 1rem;"><i class="ph ph-floppy-disk"></i> Salvar Animal</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Modal de Visualização do Animal -->
+        <div id="modal-animal-view" class="modal">
+            <div class="modal-content">
+                <span class="modal-close" onclick="document.getElementById('modal-animal-view').style.display='none'">&times;</span>
+                <h3 style="color:var(--primary-color);" id="view-animal-title">Detalhes do Animal</h3>
+                
+                <div class="animal-view-data">
+                    <div class="animal-photo-container">
+                        <img id="view-animal-foto" src="" alt="Foto do Animal">
+                        <button class="btn btn-warning btn-sm" id="btn-edit-view"><i class="ph ph-pencil"></i> Editar</button>
+                        <button class="btn btn-danger btn-sm" id="btn-delete-view"><i class="ph ph-trash"></i> Excluir</button>
+                    </div>
+                    <dl class="animal-details" id="view-animal-details">
+                        <!-- Detalhes injetados via JS -->
+                    </dl>
+                </div>
+                
+                <div class="animal-view-tabs" id="animal-view-tabs">
+                    <button class="animal-view-tab-btn active" data-tab="historico">Histórico de Eventos</button>
+                    <button class="animal-view-tab-btn" data-tab="producao-tab">Produção Leiteira</button>
+                    <button class="animal-view-tab-btn" data-tab="lactacoes">Registros de Lactação</button>
+                </div>
+                
+                <div id="historico" class="animal-view-tab-content active">
+                    <ul class="timeline" id="animal-historico-timeline">
+                        <!-- Histórico injetado via JS -->
+                    </ul>
+                </div>
+                
+                <div id="producao-tab" class="animal-view-tab-content">
+                    <h4 style="color:var(--secondary-color);">Gráfico de Produção Leiteira</h4>
+                    <canvas id="animalProducaoChart" style="max-height: 300px;"></canvas>
+                    
+                    <h4 style="margin-top: 15px; color:var(--secondary-color);">Registros de Produção (Últimos 15)</h4>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>Data</th><th>Período</th><th>Litros</th><th>Ações</th></tr>
+                            </thead>
+                            <tbody id="animal-producao-list">
+                                <!-- Produção injetada via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="lactacoes" class="animal-view-tab-content">
+                    <h4 style="color:var(--secondary-color);">Registros de Lactação</h4>
+                     <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>Início</th><th>Fim (Secagem)</th><th>Parto Relacionado</th><th>Total (L)</th><th>Ações</th></tr>
+                            </thead>
+                            <tbody id="animal-lactacoes-list">
+                                <!-- Lactações injetadas via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Modal de Importação CSV -->
+        <div id="modal-importar-csv" class="modal">
+            <div class="modal-content">
+                <span class="modal-close" onclick="document.getElementById('modal-importar-csv').style.display='none'">&times;</span>
+                <h3 style="color:var(--secondary-color);">Importar Animais de Arquivo CSV</h3>
+                <p>O arquivo CSV deve ter as seguintes colunas (na ordem): ID, Nome, Raça, Categoria, Peso, DataNasc, DataAquisicao, StatusReprodutivo, DataUltimoParto, DataSecagem, DataPrevisaoParto. Colunas vazias são permitidas.</p>
+                
+                <div class="form-group">
+                    <label for="input-importar-csv">Selecionar Arquivo CSV:</label>
+                    <input type="file" id="input-importar-csv" accept=".csv" required>
+                </div>
+                <button class="btn btn-primary" id="btn-importar-csv" disabled><i class="ph ph-file-csv"></i> Importar Animais</button>
+            </div>
+        </div>
+
+
+        <!-- Container para o Alerta Personalizado (Será usado para o prepend) -->
+        <!-- O container será o body, mas para evitar erro de referência nula, a lógica foi corrigida no JS. -->
+
+    </div> <!-- Fim Container -->
+
+    <script>
+        // Configurações globais e funções utilitárias
+        const APP_VERSION = "v8.0";
+        const STORAGE_KEY = `rebanho-data-${APP_VERSION}`;
+        const PLACEHOLDER_FOTO = "https://placehold.co/250x250/28a745/ffffff?text=Sem+Foto";
+
+        // Variáveis de Estado
+        let rebanhoData = {
+            animais: [],
+            producaoLeite: [],
+            tarefas: [],
+            lactacoes: [],
+            nextAnimalId: 1
+        };
+        let producaoDiariaChart;
+        let distribuicaoRebanhoChart;
+        let animalProducaoChart;
+
+        // Variáveis de Câmera
+        let videoStream = null;
+
+        // --- Mapeamento DOM ---
+        const DOM = {
+            // Navegação
+            navLinks: document.querySelectorAll('.nav-link'),
+            pageSections: document.querySelectorAll('.page-section'),
+
+            // Dashboard
+            totalAnimais: document.getElementById('total-animais'),
+            vacasLactacao: document.getElementById('vacas-lactacao'),
+            tarefasPendentes: document.getElementById('tarefas-pendentes'),
+            producaoMediaDiaria: document.getElementById('producao-media-diaria'),
+            proximasTarefasLista: document.getElementById('proximas-tarefas-lista'),
+            proximosPartosLista: document.getElementById('proximos-partos-lista'),
+            proximosCioLista: document.getElementById('proximos-cio-lista'),
+            producaoDiariaChartCanvas: document.getElementById('producaoDiariaChart'),
+            distribuicaoRebanhoChartCanvas: document.getElementById('distribuicaoRebanhoChart'),
+
+            // Animais Section
+            btnNovoAnimal: document.getElementById('btn-novo-animal'),
+            filtroCategoriaSelect: document.getElementById('filtro-categoria'),
+            buscaAnimalInput: document.getElementById('busca-animal'),
+            animalListTbody: document.getElementById('animal-list-tbody'),
+
+            // Modal Animal Form
+            modalAnimalForm: document.getElementById('modal-animal-form'),
+            animalForm: document.getElementById('animal-form'),
+            animalIdInput: document.getElementById('animal-id'),
+            animalNomeInput: document.getElementById('animal-nome'),
+            animalRacaInput: document.getElementById('animal-raca'),
+            animalCategoriaSelect: document.getElementById('animal-categoria-select'),
+            animalPesoInput: document.getElementById('animal-peso'),
+            animalDataNascInput: document.getElementById('animal-data-nasc'),
+            animalDataAquisicaoInput: document.getElementById('animal-data-aquisicao'),
+            vacaFields: document.getElementById('vaca-fields'),
+            animalStatusReprodutivo: document.getElementById('animal-status-reprodutivo'),
+            animalDataUltimoParto: document.getElementById('animal-data-ultimo-parto'),
+            animalDataSecagem: document.getElementById('animal-data-secagem'),
+            animalDataPrevisaoParto: document.getElementById('animal-data-previsao-parto'),
+            animalFotoInput: document.getElementById('animal-foto-input'),
+            fotoPreview: document.getElementById('foto-preview'),
+            
+            // Câmera
+            cameraVideo: document.getElementById('camera-video'),
+            cameraCanvas: document.getElementById('camera-canvas'),
+            btnTirarFoto: document.getElementById('btn-tirar-foto'),
+            btnCancelarCamera: document.getElementById('btn-cancelar-camera'),
+
+            // Produção Leite
+            leiteForm: document.getElementById('leite-form'),
+            leiteDataInput: document.getElementById('leite-data-input'),
+            leitePeriodoSelect: document.getElementById('leite-periodo-select'),
+            leiteVacaSelect: document.getElementById('leite-vaca-select'),
+            leiteQuantidadeInput: document.getElementById('leite-quantidade-input'),
+            leiteListTbody: document.getElementById('leite-list-tbody'),
+
+            // Tarefas (Saúde/Reprodução)
+            tarefaForm: document.getElementById('tarefa-form'),
+            tarefaAnimalSelect: document.getElementById('tarefa-animal-select'),
+            tarefaTipoSelect: document.getElementById('tarefa-tipo-select'),
+            tarefaData: document.getElementById('tarefa-data'),
+            tarefaDescricao: document.getElementById('tarefa-descricao'),
+            tarefaListTbody: document.getElementById('tarefa-list-tbody'),
+
+            // Modal Animal View
+            modalAnimalView: document.getElementById('modal-animal-view'),
+            viewAnimalTitle: document.getElementById('view-animal-title'),
+            viewAnimalFoto: document.getElementById('view-animal-foto'),
+            viewAnimalDetails: document.getElementById('view-animal-details'),
+            btnEditView: document.getElementById('btn-edit-view'),
+            btnDeleteView: document.getElementById('btn-delete-view'),
+            
+            // Tabs de Visualização do Animal
+            animalViewTabsContainer: document.getElementById('animal-view-tabs'),
+            animalHistoricoTimeline: document.getElementById('animal-historico-timeline'),
+            animalProducaoChartCanvas: document.getElementById('animalProducaoChart'),
+            animalProducaoList: document.getElementById('animal-producao-list'),
+            animalLactacoesList: document.getElementById('animal-lactacoes-list'),
+
+            // Configurações
+            resetDataBtn: document.getElementById('reset-data-btn'),
+            btnExportarJson: document.getElementById('btn-exportar-json'),
+            btnExportarCsv: document.getElementById('btn-exportar-csv'),
+            btnGerarRelatorioPdf: document.getElementById('btn-gerar-relatorio-pdf'),
+            idPrefixForm: document.getElementById('id-prefix-form'),
+            idPrefixInput: document.getElementById('id-prefix-input'),
+            currentIdPrefix: document.getElementById('current-id-prefix'),
+            inputImportarDados: document.getElementById('input-importar-dados'),
+            btnImportarDados: document.getElementById('btn-importar-dados'),
+            btnImportarDadosModal: document.getElementById('btn-importar-dados-modal'),
+            
+            // Modal Importar CSV
+            modalImportarCsv: document.getElementById('modal-importar-csv'),
+            btnImportarCsvModal: document.getElementById('btn-importar-csv-modal'),
+            inputImportarCsv: document.getElementById('input-importar-csv'),
+            btnImportarCsv: document.getElementById('btn-importar-csv')
+        };
+
+
+        // --- Funções de Utilitário ---
+
+        // Função para formatar a idade
+        function calculateAge(dateOfBirth) {
+            if (!dateOfBirth) return 'N/D';
+            const birth = new Date(dateOfBirth);
+            const today = new Date();
+            let ageYears = today.getFullYear() - birth.getFullYear();
+            let ageMonths = today.getMonth() - birth.getMonth();
+
+            if (ageMonths < 0 || (ageMonths === 0 && today.getDate() < birth.getDate())) {
+                ageYears--;
+                ageMonths += 12;
+            }
+            if (ageYears < 1) {
+                return `${ageMonths} meses`;
+            }
+            return `${ageYears} anos e ${ageMonths} meses`;
+        }
+
+        // Função para formatar o ID
+        function formatAnimalId(id) {
+            const prefix = localStorage.getItem('idPrefix') || 'ID';
+            return `${prefix}${String(id).padStart(4, '0')}`;
+        }
+        
+        // Função para calcular próxima data de cio/parto
+        function calculateNextReproDate(lastDate, type) {
+            if (!lastDate) return 'N/D';
+            const date = new Date(lastDate);
+            let daysToAdd = 0;
+
+            if (type === 'parto') {
+                // Previsão de parto (Ex: 285 dias após a última cobertura/inseminação que resultou em prenhez)
+                // Usando a data do último parto para prever o próximo cio, não o parto.
+                // Esta função será usada para prever cio (21 dias) e o parto previsto (a partir da cobertura)
+                return 'N/D'; 
+            } else if (type === 'cio') {
+                // Previsão de Cio (Ex: 21 dias após o parto ou último cio/cobertura)
+                daysToAdd = 21;
+            }
+
+            if (daysToAdd > 0) {
+                date.setDate(date.getDate() + daysToAdd);
+                return date.toISOString().split('T')[0];
+            }
+            return 'N/D';
+        }
+
+        // --- Funções de Persistência (Local Storage) ---
+        function loadData() {
+            try {
+                const dataString = localStorage.getItem(STORAGE_KEY);
+                if (dataString) {
+                    rebanhoData = JSON.parse(dataString);
+                }
+                
+                // Inicializa o prefixo do ID se não existir
+                if (!localStorage.getItem('idPrefix')) {
+                    localStorage.setItem('idPrefix', 'ID');
+                }
+                if (DOM.currentIdPrefix) {
+                    DOM.currentIdPrefix.textContent = localStorage.getItem('idPrefix');
+                }
+                if (DOM.idPrefixInput) {
+                    DOM.idPrefixInput.value = localStorage.getItem('idPrefix');
+                }
+                
+            } catch (e) {
+                console.error("Erro ao carregar dados do LocalStorage:", e);
+                // Limpa dados corrompidos se necessário
+                // localStorage.removeItem(STORAGE_KEY);
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(rebanhoData));
+            } catch (e) {
+                console.error("Erro ao salvar dados no LocalStorage:", e);
+                showCustomAlert('Erro ao salvar dados. Seu navegador pode estar sem espaço.');
+            }
+            
+            // Re-renderiza e atualiza todas as views após salvar
+            updateDashboard();
+            renderAnimalList();
+            renderLeiteList();
+            renderProximasTarefas();
+            populateSelects();
+        }
+        
+        // --- Funções de Navegação e UI ---
+        
+        function showSection(sectionId) {
+            DOM.pageSections.forEach(section => {
+                section.style.display = section.id === sectionId ? 'block' : 'none';
+            });
+
+            DOM.navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.section === sectionId) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Atualiza o hash da URL
+            window.location.hash = sectionId;
+            
+            // Chama a função de atualização específica da seção
+            if (sectionId === 'dashboard') {
+                updateDashboard();
+            } else if (sectionId === 'animais') {
+                renderAnimalList();
+            } else if (sectionId === 'producao') {
+                renderLeiteList();
+            } else if (sectionId === 'saude') {
+                renderTarefaList();
+            }
+        }
+
+        // --- Funções de CRUD (Animal) ---
+
+        function openAnimalForm(animalId = null) {
+            DOM.modalAnimalForm.style.display = 'flex';
+            DOM.animalForm.reset();
+            DOM.animalIdInput.value = '';
+            DOM.vacaFields.style.display = 'none';
+            DOM.fotoPreview.style.display = 'none';
+            DOM.fotoPreview.src = '';
+            
+            // Limpa camera se estiver ativa
+            stopCamera();
+
+            if (animalId) {
+                const animal = rebanhoData.animais.find(a => a.id === animalId);
+                if (animal) {
+                    DOM.animalIdInput.value = animal.id;
+                    DOM.animalNomeInput.value = animal.nome;
+                    DOM.animalRacaInput.value = animal.raca;
+                    DOM.animalCategoriaSelect.value = animal.categoria;
+                    DOM.animalPesoInput.value = animal.peso;
+                    DOM.animalDataNascInput.value = animal.dataNasc;
+                    DOM.animalDataAquisicaoInput.value = animal.dataAquisicao || '';
+                    
+                    // Campos de Vaca/Novilha
+                    if (['Vaca', 'Novilha'].includes(animal.categoria)) {
+                        DOM.vacaFields.style.display = 'block';
+                        DOM.animalStatusReprodutivo.value = animal.statusReprodutivo;
+                        DOM.animalDataUltimoParto.value = animal.dataUltimoParto || '';
+                        DOM.animalDataSecagem.value = animal.dataSecagem || '';
+                        DOM.animalDataPrevisaoParto.value = animal.dataPrevisaoParto || '';
+                    }
+                    
+                    // Foto
+                    if (animal.fotoBase64) {
+                        DOM.fotoPreview.src = animal.fotoBase64;
+                        DOM.fotoPreview.style.display = 'block';
+                    }
+                }
+            }
+        }
+
+        function saveAnimal(event) {
+            event.preventDefault();
+
+            const animalId = DOM.animalIdInput.value ? parseInt(DOM.animalIdInput.value) : null;
+            const categoria = DOM.animalCategoriaSelect.value;
+            
+            let animal = {
+                id: animalId, // Será atribuído ou mantido
+                nome: DOM.animalNomeInput.value,
+                raca: DOM.animalRacaInput.value,
+                categoria: categoria,
+                peso: parseFloat(DOM.animalPesoInput.value),
+                dataNasc: DOM.animalDataNascInput.value,
+                dataAquisicao: DOM.animalDataAquisicaoInput.value,
+                fotoBase64: DOM.fotoPreview.src, // Salva o base64 da preview
+                // Campos de reprodução
+                statusReprodutivo: ['Vaca', 'Novilha'].includes(categoria) ? DOM.animalStatusReprodutivo.value : 'N/A',
+                dataUltimoParto: (['Vaca', 'Novilha'].includes(categoria) ? DOM.animalDataUltimoParto.value : '') || '',
+                dataSecagem: (['Vaca', 'Novilha'].includes(categoria) ? DOM.animalDataSecagem.value : '') || '',
+                dataPrevisaoParto: (['Vaca', 'Novilha'].includes(categoria) ? DOM.animalDataPrevisaoParto.value : '') || '',
+            };
+            
+            // Lógica de Novo Animal
+            if (!animalId) {
+                animal.id = rebanhoData.nextAnimalId++;
+                rebanhoData.animais.push(animal);
+                showCustomAlert(`Animal ${formatAnimalId(animal.id)} adicionado com sucesso!`);
+            } else {
+                // Lógica de Edição
+                const index = rebanhoData.animais.findIndex(a => a.id === animalId);
+                if (index !== -1) {
+                    rebanhoData.animais[index] = animal;
+                    showCustomAlert(`Animal ${formatAnimalId(animal.id)} atualizado com sucesso!`);
+                }
+            }
+
+            saveData();
+            DOM.modalAnimalForm.style.display = 'none';
+        }
+        
+        function deleteAnimal(animalId) {
+            showCustomConfirm('Tem certeza que deseja EXCLUIR este animal e todos os seus registros de leite/tarefas?', () => {
+                rebanhoData.animais = rebanhoData.animais.filter(a => a.id !== animalId);
+                rebanhoData.producaoLeite = rebanhoData.producaoLeite.filter(p => p.animalId !== animalId);
+                rebanhoData.tarefas = rebanhoData.tarefas.filter(t => t.animalId !== animalId);
+                rebanhoData.lactacoes = rebanhoData.lactacoes.filter(l => l.animalId !== animalId);
+                saveData();
+                DOM.modalAnimalView.style.display = 'none';
+                showCustomAlert(`Animal ${formatAnimalId(animalId)} e seus registros foram excluídos.`);
+            });
+        }
+        
+        function viewAnimal(animalId) {
+            const animal = rebanhoData.animais.find(a => a.id === animalId);
+            if (!animal) return;
+
+            DOM.viewAnimalTitle.textContent = `${formatAnimalId(animal.id)} - ${animal.nome}`;
+            DOM.viewAnimalFoto.src = animal.fotoBase64 || PLACEHOLDER_FOTO;
+            
+            // Botões de Ação
+            DOM.btnEditView.onclick = () => { DOM.modalAnimalView.style.display = 'none'; openAnimalForm(animalId); };
+            DOM.btnDeleteView.onclick = () => deleteAnimal(animalId);
+
+            // Detalhes
+            DOM.viewAnimalDetails.innerHTML = `
+                <dt>Categoria</dt><dd>${animal.categoria}</dd>
+                <dt>Raça</dt><dd>${animal.raca}</dd>
+                <dt>Idade</dt><dd>${calculateAge(animal.dataNasc)}</dd>
+                <dt>Data Nasc.</dt><dd>${new Date(animal.dataNasc).toLocaleDateString()}</dd>
+                <dt>Peso (Kg)</dt><dd>${animal.peso}</dd>
+                ${['Vaca', 'Novilha'].includes(animal.categoria) ? `
+                    <dt>Status Reprodutivo</dt><dd>${animal.statusReprodutivo}</dd>
+                    <dt>Último Parto</dt><dd>${animal.dataUltimoParto ? new Date(animal.dataUltimoParto).toLocaleDateString() : 'N/D'}</dd>
+                    <dt>Data Secagem</dt><dd>${animal.dataSecagem ? new Date(animal.dataSecagem).toLocaleDateString() : 'N/D'}</dd>
+                    <dt>Previsão Parto</dt><dd>${animal.dataPrevisaoParto ? new Date(animal.dataPrevisaoParto).toLocaleDateString() : 'N/D'}</dd>
+                ` : ''}
+            `;
+            
+            // Renderiza Tabs
+            renderAnimalHistorico(animalId);
+            renderAnimalProducao(animalId);
+            renderAnimalLactacoes(animalId);
+            
+            // Inicializa gráfico se necessário
+            if (!animalProducaoChart) {
+                initAnimalProducaoChart();
+            } else {
+                updateAnimalProducaoChart(animalId);
+            }
+            
+            // Exibe a primeira aba e o modal
+            document.querySelectorAll('#animal-view-tabs button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#modal-animal-view .animal-view-tab-content').forEach(content => content.style.display = 'none');
+            
+            const defaultTabBtn = document.querySelector('#animal-view-tabs button[data-tab="historico"]');
+            const defaultTabContent = document.getElementById('historico');
+            
+            if (defaultTabBtn) defaultTabBtn.classList.add('active');
+            if (defaultTabContent) defaultTabContent.style.display = 'block';
+
+            DOM.modalAnimalView.style.display = 'flex';
+        }
+        
+        // --- Funções de Renderização (Listas) ---
+
+        function renderAnimalList() {
+            if (!DOM.animalListTbody) return;
+
+            const filtroCategoria = DOM.filtroCategoriaSelect.value;
+            const buscaTermo = DOM.buscaAnimalInput.value.toLowerCase();
+            
+            const filteredAnimais = rebanhoData.animais
+                .filter(a => filtroCategoria === '' || a.categoria === filtroCategoria)
+                .filter(a => 
+                    a.nome.toLowerCase().includes(buscaTermo) || 
+                    formatAnimalId(a.id).toLowerCase().includes(buscaTermo)
+                )
+                .sort((a, b) => a.id - b.id);
+
+            DOM.animalListTbody.innerHTML = filteredAnimais.map(animal => {
+                const idade = calculateAge(animal.dataNasc);
+                const status = animal.statusReprodutivo || animal.categoria;
+                return `
+                    <tr>
+                        <td>${formatAnimalId(animal.id)}</td>
+                        <td>${animal.nome}</td>
+                        <td>${animal.categoria}</td>
+                        <td>${idade}</td>
+                        <td>${status}</td>
+                        <td style="white-space: nowrap;">
+                            <button class="btn btn-info btn-sm" onclick="viewAnimal(${animal.id})"><i class="ph ph-eye"></i> Ver</button>
+                            <button class="btn btn-warning btn-sm" onclick="editAnimal(${animal.id})"><i class="ph ph-pencil"></i> Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteAnimal(${animal.id})"><i class="ph ph-trash"></i> Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function renderLeiteList() {
+             if (!DOM.leiteListTbody) return;
+
+             const leiteList = rebanhoData.producaoLeite
+                .sort((a, b) => new Date(b.data) - new Date(a.data)) // Mais recente primeiro
+                .slice(0, 15); // Apenas os 15 mais recentes
+
+            DOM.leiteListTbody.innerHTML = leiteList.map(registro => {
+                const animal = rebanhoData.animais.find(a => a.id === registro.animalId);
+                const animalNome = animal ? `${formatAnimalId(animal.id)} - ${animal.nome}` : 'Animal Excluído';
+                return `
+                    <tr>
+                        <td>${new Date(registro.data).toLocaleDateString()}</td>
+                        <td><a href="#" onclick="event.preventDefault(); viewAnimal(${registro.animalId})">${animalNome}</a></td>
+                        <td>${registro.periodo === 'manha' ? 'Manhã' : 'Tarde'}</td>
+                        <td>${registro.quantidade.toFixed(1)} L</td>
+                        <td style="white-space: nowrap;">
+                            <button class="btn btn-danger btn-sm" onclick="deleteLeiteRegistro('${registro.id}')"><i class="ph ph-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function renderTarefaList() {
+             if (!DOM.tarefaListTbody) return;
+
+             const tarefasPendentes = rebanhoData.tarefas
+                .filter(t => !t.done)
+                .sort((a, b) => new Date(a.data) - new Date(b.data)); // Mais antiga primeiro
+
+            DOM.tarefaListTbody.innerHTML = tarefasPendentes.map(tarefa => {
+                const animal = rebanhoData.animais.find(a => a.id === tarefa.animalId);
+                const animalNome = animal ? `${formatAnimalId(animal.id)} - ${animal.nome}` : 'Animal Excluído';
+                const dataFormatada = new Date(tarefa.data).toLocaleDateString();
+                const hoje = new Date().toISOString().split('T')[0];
+                const cor = tarefa.data < hoje ? 'color: var(--danger-color); font-weight: 700;' : '';
+                
+                return `
+                    <tr style="${cor}">
+                        <td>${dataFormatada}</td>
+                        <td><a href="#" onclick="event.preventDefault(); viewAnimal(${tarefa.animalId})">${animalNome}</a></td>
+                        <td>${tarefa.tipo}</td>
+                        <td>${tarefa.descricao}</td>
+                        <td style="white-space: nowrap;">
+                            <button class="btn btn-success btn-sm" onclick="markTarefaAsDone('${tarefa.id}')"><i class="ph ph-check"></i> Feito</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteTarefa('${tarefa.id}')"><i class="ph ph-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function renderProximasTarefas() {
+             if (!DOM.proximasTarefasLista) return;
+
+             const proximas = rebanhoData.tarefas
+                .filter(t => !t.done)
+                .sort((a, b) => new Date(a.data) - new Date(b.data))
+                .slice(0, 5);
+                
+             if (proximas.length === 0) {
+                 DOM.proximasTarefasLista.innerHTML = `<p class="text-secondary">Nenhuma tarefa pendente.</p>`;
+                 return;
+             }
+
+            DOM.proximasTarefasLista.innerHTML = proximas.map(tarefa => {
+                const animal = rebanhoData.animais.find(a => a.id === tarefa.animalId);
+                const animalNome = animal ? `${formatAnimalId(animal.id)} - ${animal.nome}` : 'Animal Excluído';
+                const dataFormatada = new Date(tarefa.data).toLocaleDateString();
+                const hoje = new Date().toISOString().split('T')[0];
+                const cor = tarefa.data < hoje ? 'border-color: var(--danger-color);' : '';
+                
+                return `
+                    <li class="tarefa-item" style="${cor}">
+                        <div class="tarefa-info">
+                            <strong>${tarefa.tipo}: ${tarefa.descricao}</strong>
+                            <div class="tarefa-meta">Para: ${animalNome} | Data: ${dataFormatada}</div>
+                        </div>
+                         <button class="btn btn-success btn-sm" onclick="markTarefaAsDone('${tarefa.id}')"><i class="ph ph-check"></i></button>
+                    </li>
+                `;
+            }).join('');
+        }
+        
+        function renderProximosEventosReprodutivos() {
+            if (!DOM.proximosPartosLista || !DOM.proximosCioLista) return;
+            
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            const thirtyDaysLater = new Date(today);
+            thirtyDaysLater.setDate(today.getDate() + 30);
+            
+            const proximosPartos = rebanhoData.animais
+                .filter(a => 
+                    a.categoria === 'Vaca' && 
+                    a.statusReprodutivo === 'Prenhe' &&
+                    a.dataPrevisaoParto && 
+                    new Date(a.dataPrevisaoParto) >= tomorrow && 
+                    new Date(a.dataPrevisaoParto) <= thirtyDaysLater
+                )
+                .sort((a, b) => new Date(a.dataPrevisaoParto) - new Date(b.dataPrevisaoParto));
+            
+            DOM.proximosPartosLista.innerHTML = proximosPartos.map(animal => {
+                return `
+                    <li class="tarefa-item danger" onclick="viewAnimal(${animal.id})" style="cursor:pointer; border-color:var(--danger-color);">
+                        <div class="tarefa-info">
+                            <strong>Parto de ${animal.nome}</strong>
+                            <div class="tarefa-meta">Previsto: ${new Date(animal.dataPrevisaoParto).toLocaleDateString()}</div>
+                        </div>
+                    </li>
+                `;
+            }).join('') || `<p class="text-secondary">Nenhum parto previsto para os próximos 30 dias.</p>`;
+
+            // Para previsão de cio, procuramos por vacas que tiveram parto recentemente (Ex: 21 dias após parto)
+            // ou que tiveram uma cobertura/cio recente e estão 'Vazias'.
+            const proximosCio = rebanhoData.animais
+                .filter(a => a.categoria === 'Vaca' && a.statusReprodutivo === 'Vazia' && a.dataUltimoParto)
+                .map(animal => {
+                    const nextCioDate = new Date(animal.dataUltimoParto);
+                    nextCioDate.setDate(nextCioDate.getDate() + 21); // 21 dias pós-parto
+                    
+                    if (nextCioDate >= tomorrow && nextCioDate <= thirtyDaysLater) {
+                        return { 
+                            id: animal.id, 
+                            nome: animal.nome, 
+                            dataCio: nextCioDate.toISOString().split('T')[0] 
+                        };
+                    }
+                    return null;
+                })
+                .filter(c => c !== null)
+                .sort((a, b) => new Date(a.dataCio) - new Date(b.dataCio));
+                
+            DOM.proximosCioLista.innerHTML = proximosCio.map(cio => {
+                return `
+                    <li class="tarefa-item warning" onclick="viewAnimal(${cio.id})" style="cursor:pointer; border-color:var(--warning-color);">
+                        <div class="tarefa-info">
+                            <strong>Cio de ${cio.nome}</strong>
+                            <div class="tarefa-meta">Previsto: ${new Date(cio.dataCio).toLocaleDateString()}</div>
+                        </div>
+                    </li>
+                `;
+            }).join('') || `<p class="text-secondary">Nenhuma previsão de cio para os próximos 30 dias.</p>`;
+        }
+
+
+        // --- Funções de Gráfico (Chart.js) ---
+
+        function initCharts() {
+            initProducaoDiariaChart();
+            initDistribuicaoRebanhoChart();
+            initAnimalProducaoChart();
+        }
+
+        function initProducaoDiariaChart() {
+            if (!DOM.producaoDiariaChartCanvas) return;
+            const ctx = DOM.producaoDiariaChartCanvas.getContext('2d');
+            
+            producaoDiariaChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [], // Datas
+                    datasets: [{
+                        label: 'Litros de Leite',
+                        data: [], // Quantidades
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Litros'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+            updateProducaoDiariaChart();
+        }
+        
+        function updateProducaoDiariaChart() {
+            if (!producaoDiariaChart) return;
+
+            const days = 28;
+            const data = rebanhoData.producaoLeite;
+            
+            // Agrega produção por data
+            const dailyProduction = {};
+            data.forEach(p => {
+                const date = p.data;
+                if (!dailyProduction[date]) {
+                    dailyProduction[date] = 0;
+                }
+                dailyProduction[date] += p.quantidade;
+            });
+
+            // Gera labels e dados para os últimos 'days'
+            const labels = [];
+            const dataSet = [];
+            let currentDate = new Date();
+            currentDate.setDate(currentDate.getDate() - days + 1); // Começa 'days' dias atrás
+
+            for (let i = 0; i < days; i++) {
+                const dateString = currentDate.toISOString().split('T')[0];
+                labels.push(new Date(dateString).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }));
+                dataSet.push(dailyProduction[dateString] || 0);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            producaoDiariaChart.data.labels = labels;
+            producaoDiariaChart.data.datasets[0].data = dataSet;
+            producaoDiariaChart.update();
+            
+            // Atualiza Métrica de Média Diária (Últimos 7 dias)
+            const last7DaysData = dataSet.slice(-7);
+            const total7Days = last7DaysData.reduce((sum, value) => sum + value, 0);
+            const avgDaily = last7DaysData.length > 0 ? (total7Days / last7DaysData.length).toFixed(1) : '0';
+            if (DOM.producaoMediaDiaria) {
+                DOM.producaoMediaDiaria.textContent = `${avgDaily} L`;
+            }
+        }
+
+        function initDistribuicaoRebanhoChart() {
+            if (!DOM.distribuicaoRebanhoChartCanvas) return;
+            const ctx = DOM.distribuicaoRebanhoChartCanvas.getContext('2d');
+
+            distribuicaoRebanhoChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' }
+                    }
+                }
+            });
+            updateDistribuicaoRebanhoChart();
+        }
+        
+        function updateDistribuicaoRebanhoChart() {
+            if (!distribuicaoRebanhoChart) return;
+            
+            const counts = rebanhoData.animais.reduce((acc, animal) => {
+                acc[animal.categoria] = (acc[animal.categoria] || 0) + 1;
+                return acc;
+            }, {});
+            
+            const labels = Object.keys(counts);
+            const data = Object.values(counts);
+
+            distribuicaoRebanhoChart.data.labels = labels;
+            distribuicaoRebanhoChart.data.datasets[0].data = data;
+            distribuicaoRebanhoChart.update();
+        }
+        
+        function initAnimalProducaoChart() {
+            if (!DOM.animalProducaoChartCanvas) return;
+            const ctx = DOM.animalProducaoChartCanvas.getContext('2d');
+            
+            animalProducaoChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [], // Datas
+                    datasets: [{
+                        label: 'Litros (Manhã)',
+                        data: [],
+                        backgroundColor: 'rgba(0, 123, 255, 0.6)'
+                    },
+                    {
+                        label: 'Litros (Tarde)',
+                        data: [],
+                        backgroundColor: 'rgba(40, 167, 69, 0.6)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            stacked: true
+                        },
+                        x: {
+                            stacked: true
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+        }
+        
+        function updateAnimalProducaoChart(animalId) {
+            if (!animalProducaoChart) return;
+            
+            const animalData = rebanhoData.producaoLeite.filter(p => p.animalId === animalId);
+            
+            // Agrega produção por data e período
+            const dailyProduction = {};
+            animalData.forEach(p => {
+                const date = p.data;
+                if (!dailyProduction[date]) {
+                    dailyProduction[date] = { manha: 0, tarde: 0 };
+                }
+                dailyProduction[date][p.periodo] += p.quantidade;
+            });
+            
+            // Filtra para os últimos 14 dias
+            const days = 14;
+            const labels = [];
+            const manhaData = [];
+            const tardeData = [];
+            let currentDate = new Date();
+            currentDate.setDate(currentDate.getDate() - days + 1);
+
+            for (let i = 0; i < days; i++) {
+                const dateString = currentDate.toISOString().split('T')[0];
+                const data = dailyProduction[dateString] || { manha: 0, tarde: 0 };
+                
+                labels.push(new Date(dateString).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }));
+                manhaData.push(data.manha.toFixed(1));
+                tardeData.push(data.tarde.toFixed(1));
+                
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            animalProducaoChart.data.labels = labels;
+            animalProducaoChart.data.datasets[0].data = manhaData;
+            animalProducaoChart.data.datasets[1].data = tardeData;
+            animalProducaoChart.update();
+        }
+
+
+        // --- Funções de Atualização do Dashboard ---
+
+        function updateDashboard() {
+            if (DOM.totalAnimais) {
+                DOM.totalAnimais.textContent = rebanhoData.animais.length;
+            }
+            
+            const vacasEmLactacao = rebanhoData.animais.filter(a => a.categoria === 'Vaca' && a.statusReprodutivo === 'Em Lactação').length;
+            if (DOM.vacasLactacao) {
+                DOM.vacasLactacao.textContent = vacasEmLactacao;
+            }
+            
+            const tarefasPendentes = rebanhoData.tarefas.filter(t => !t.done).length;
+            if (DOM.tarefasPendentes) {
+                DOM.tarefasPendentes.textContent = tarefasPendentes;
+            }
+            
+            updateProducaoDiariaChart();
+            updateDistribuicaoRebanhoChart();
+            renderProximasTarefas();
+            renderProximosEventosReprodutivos();
+        }
+        
+        // --- Funções de Preenchimento de Selects ---
+        
+        function populateSelects() {
+            populateSelectVacaLactacao();
+            populateTarefaAnimalSelect();
+        }
+
+        function populateSelectVacaLactacao() {
+            if (!DOM.leiteVacaSelect) return;
+            
+            const vacasLactacao = rebanhoData.animais.filter(a => a.categoria === 'Vaca' && a.statusReprodutivo === 'Em Lactação').sort((a, b) => a.nome.localeCompare(b.nome));
+
+            DOM.leiteVacaSelect.innerHTML = '<option value="">Selecione a Vaca...</option>' +
+                vacasLactacao.map(vaca => `
+                    <option value="${vaca.id}">${formatAnimalId(vaca.id)} - ${vaca.nome}</option>
+                `).join('');
+        }
+
+        function populateTarefaAnimalSelect() {
+            if (!DOM.tarefaAnimalSelect) return;
+            
+            const animaisOrdenados = rebanhoData.animais.sort((a, b) => a.nome.localeCompare(b.nome));
+
+            DOM.tarefaAnimalSelect.innerHTML = '<option value="">Selecione o Animal...</option>' +
+                animaisOrdenados.map(animal => `
+                    <option value="${animal.id}">${formatAnimalId(animal.id)} - ${animal.nome} (${animal.categoria})</option>
+                `).join('');
+        }
+
+        // --- Funções de Reprodução e Saúde (Tarefas) ---
+        
+        function saveTarefa(event) {
+            event.preventDefault();
+            
+            const newTarefa = {
+                id: crypto.randomUUID(),
+                animalId: parseInt(DOM.tarefaAnimalSelect.value),
+                tipo: DOM.tarefaTipoSelect.value,
+                data: DOM.tarefaData.value,
+                descricao: DOM.tarefaDescricao.value,
+                done: false
+            };
+            
+            rebanhoData.tarefas.push(newTarefa);
+            showCustomAlert(`Tarefa de ${newTarefa.tipo} para ${formatAnimalId(newTarefa.animalId)} adicionada!`);
+            DOM.tarefaForm.reset();
+            DOM.tarefaData.value = new Date().toISOString().split('T')[0];
+            saveData();
+            renderTarefaList();
+        }
+        
+        function markTarefaAsDone(tarefaId) {
+            showCustomConfirm('Marcar esta tarefa como CONCLUÍDA?', () => {
+                const tarefa = rebanhoData.tarefas.find(t => t.id === tarefaId);
+                if (tarefa) {
+                    tarefa.done = true;
+                    saveData();
+                    showCustomAlert(`Tarefa ${tarefa.id} concluída!`);
+                    renderTarefaList();
+                }
+            });
+        }
+        
+        function deleteTarefa(tarefaId) {
+            showCustomConfirm('Excluir esta tarefa?', () => {
+                rebanhoData.tarefas = rebanhoData.tarefas.filter(t => t.id !== tarefaId);
+                saveData();
+                showCustomAlert(`Tarefa excluída!`);
+                renderTarefaList();
+            });
+        }
+        
+        // --- Funções de Produção de Leite ---
+
+        function saveLeiteRegistro(event) {
+            event.preventDefault();
+            
+            const animalId = parseInt(DOM.leiteVacaSelect.value);
+            const animal = rebanhoData.animais.find(a => a.id === animalId);
+
+            if (!animal || animal.statusReprodutivo !== 'Em Lactação') {
+                showCustomAlert('Erro: O animal selecionado não está em Lactação ou não existe.');
+                return;
+            }
+            
+            const newRegistro = {
+                id: crypto.randomUUID(),
+                animalId: animalId,
+                data: DOM.leiteDataInput.value,
+                periodo: DOM.leitePeriodoSelect.value,
+                quantidade: parseFloat(DOM.leiteQuantidadeInput.value)
+            };
+            
+            rebanhoData.producaoLeite.push(newRegistro);
+            showCustomAlert(`Registro de ${newRegistro.quantidade}L para ${animal.nome} salvo!`);
+            DOM.leiteForm.reset();
+            DOM.leiteDataInput.value = new Date().toISOString().split('T')[0];
+            saveData();
+            renderLeiteList();
+            
+            // Verifica e atualiza a lactação
+            updateLactationRecords(animalId, newRegistro.data, newRegistro.quantidade);
+        }
+        
+        function deleteLeiteRegistro(registroId) {
+             showCustomConfirm('Excluir este registro de leite?', () => {
+                const registroIndex = rebanhoData.producaoLeite.findIndex(r => r.id === registroId);
+                if (registroIndex !== -1) {
+                    const deletedRegistro = rebanhoData.producaoLeite.splice(registroIndex, 1)[0];
+                    showCustomAlert(`Registro de ${deletedRegistro.quantidade}L excluído.`);
+                    saveData();
+                    renderLeiteList();
+                    // Necessário re-renderizar o histórico do animal se o modal estiver aberto
+                    if (DOM.modalAnimalView.style.display === 'flex') {
+                        const animalId = parseInt(DOM.btnEditView.onclick.toString().match(/\((\d+)\)/)[1]);
+                        renderAnimalProducao(animalId);
+                        renderAnimalLactacoes(animalId);
+                    }
+                }
+            });
+        }
+
+        // --- Funções de Histórico do Animal ---
+
+        function renderAnimalHistorico(animalId) {
+            if (!DOM.animalHistoricoTimeline) return;
+
+            const animal = rebanhoData.animais.find(a => a.id === animalId);
+            if (!animal) return;
+
+            let historico = [];
+
+            // Eventos de Tarefas Concluídas (Parto, Cobertura, Diagnóstico, etc.)
+            rebanhoData.tarefas
+                .filter(t => t.animalId === animalId && t.done)
+                .forEach(t => {
+                    historico.push({
+                        date: t.data,
+                        type: t.tipo,
+                        title: t.tipo.toUpperCase(),
+                        description: t.descricao,
+                        isTask: true
+                    });
+                });
+                
+            // Eventos de Parto (Baseados no campo do animal, se a tarefa não for usada)
+            if (animal.dataUltimoParto) {
+                 historico.push({
+                    date: animal.dataUltimoParto,
+                    type: 'parto',
+                    title: 'PARTO (Último)',
+                    description: `Animal teve seu último parto. Previsão de cio em ${calculateNextReproDate(animal.dataUltimoParto, 'cio')}.`,
+                    isTask: false
+                });
+            }
+
+            // Agrega os eventos pela data (mais recente primeiro)
+            historico.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            DOM.animalHistoricoTimeline.innerHTML = historico.map(item => {
+                const date = new Date(item.date).toLocaleDateString();
+                return `
+                    <li class="timeline-item ${item.type.toLowerCase()}">
+                        <div class="timeline-date">${date}</div>
+                        <div class="timeline-content">
+                            <h4>${item.title} ${item.isTask ? '(Tarefa Concluída)' : ''}</h4>
+                            <p>${item.description}</p>
+                        </div>
+                    </li>
+                `;
+            }).join('');
+        }
+        
+        function renderAnimalProducao(animalId) {
+            if (!DOM.animalProducaoList) return;
+            
+            const producaoList = rebanhoData.producaoLeite
+                .filter(p => p.animalId === animalId)
+                .sort((a, b) => new Date(b.data) - new Date(a.data))
+                .slice(0, 15);
+                
+            DOM.animalProducaoList.innerHTML = producaoList.map(registro => {
+                return `
+                    <tr>
+                        <td>${new Date(registro.data).toLocaleDateString()}</td>
+                        <td>${registro.periodo === 'manha' ? 'Manhã' : 'Tarde'}</td>
+                        <td>${registro.quantidade.toFixed(1)} L</td>
+                        <td style="white-space: nowrap;">
+                            <button class="btn btn-danger btn-sm" onclick="deleteLeiteRegistro('${registro.id}')"><i class="ph ph-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('') || `<tr><td colspan="4">Nenhum registro de produção encontrado.</td></tr>`;
+        }
+        
+        // --- Funções de Lactação ---
+        
+        function updateLactationRecords(animalId, leiteDate, quantidade) {
+            let animalLactations = rebanhoData.lactacoes.filter(l => l.animalId === animalId);
+            const animal = rebanhoData.animais.find(a => a.id === animalId);
+            
+            if (!animal) return;
+
+            let isCurrentLactationFound = false;
+            
+            // 1. Encontra a lactação atual (aberta ou a mais recente)
+            let currentLactation = animalLactations
+                .filter(l => !l.dataFim) // Filtra lactações abertas
+                .sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio))[0];
+
+            if (currentLactation) {
+                isCurrentLactationFound = true;
+            } else {
+                // 2. Se não houver lactação aberta, cria uma nova (só se o animal estiver em lactação)
+                if (animal.statusReprodutivo === 'Em Lactação') {
+                    // Tenta usar a data do último parto, se disponível
+                    const dataInicio = animal.dataUltimoParto || leiteDate;
+                    currentLactation = {
+                        id: crypto.randomUUID(),
+                        animalId: animalId,
+                        dataInicio: dataInicio,
+                        dataFim: null,
+                        partoId: null, // Pode ser associado a uma tarefa de parto
+                        totalLitros: 0
+                    };
+                    rebanhoData.lactacoes.push(currentLactation);
+                }
+            }
+            
+            // 3. Adiciona a produção à lactação
+            if (currentLactation) {
+                // Garante que o registro de leite não seja anterior ao início da lactação
+                if (leiteDate >= currentLactation.dataInicio) {
+                    currentLactation.totalLitros = (currentLactation.totalLitros || 0) + quantidade;
+                }
+            }
+            
+            // 4. Verifica se a lactação foi fechada (Secagem)
+            if (animal.statusReprodutivo === 'Seca' && currentLactation && !currentLactation.dataFim) {
+                currentLactation.dataFim = animal.dataSecagem || leiteDate; // Usa data da secagem ou a data do registro de leite
+            }
+            
+            // Se houver alguma mudança, salva.
+            if (isCurrentLactationFound || currentLactation) {
+                saveData();
+            }
+        }
+        
+        function renderAnimalLactacoes(animalId) {
+             if (!DOM.animalLactacoesList) return;
+
+             const lactacoesList = rebanhoData.lactacoes
+                .filter(l => l.animalId === animalId)
+                .sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio)); // Mais recente primeiro
+
+            DOM.animalLactacoesList.innerHTML = lactacoesList.map(lactacao => {
+                const dataInicio = new Date(lactacao.dataInicio).toLocaleDateString();
+                const dataFim = lactacao.dataFim ? new Date(lactacao.dataFim).toLocaleDateString() : 'Em Aberto';
+                
+                return `
+                    <tr>
+                        <td>${dataInicio}</td>
+                        <td>${dataFim}</td>
+                        <td>${lactacao.partoId || 'N/D'}</td>
+                        <td>${lactacao.totalLitros ? lactacao.totalLitros.toFixed(1) + ' L' : '0 L'}</td>
+                        <td style="white-space: nowrap;">
+                            <button class="btn btn-danger btn-sm" onclick="deleteLactacaoRegistro('${lactacao.id}')"><i class="ph ph-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('') || `<tr><td colspan="5">Nenhum registro de lactação.</td></tr>`;
+        }
+
+        function deleteLactacaoRegistro(lactacaoId) {
+             showCustomConfirm('Excluir este registro de lactação? Atenção: isso não remove os registros de leite associados.', () => {
+                rebanhoData.lactacoes = rebanhoData.lactacoes.filter(l => l.id !== lactacaoId);
+                saveData();
+                showCustomAlert(`Registro de lactação excluído!`);
+                // Necessário re-renderizar o histórico do animal se o modal estiver aberto
+                if (DOM.modalAnimalView.style.display === 'flex') {
+                    const animalId = parseInt(DOM.btnEditView.onclick.toString().match(/\((\d+)\)/)[1]);
+                    renderAnimalLactacoes(animalId);
+                }
+            });
+        }
+
+
+        // --- Funções de Câmera/Foto ---
+
+        function previewFoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    DOM.fotoPreview.src = e.target.result;
+                    DOM.fotoPreview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                DOM.fotoPreview.style.display = 'none';
+                DOM.fotoPreview.src = '';
+            }
+        }
+        
+        function stopCamera() {
+             if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            if (DOM.cameraVideo) DOM.cameraVideo.style.display = 'none';
+            if (DOM.cameraCanvas) DOM.cameraCanvas.style.display = 'none';
+            if (DOM.btnTirarFoto) DOM.btnTirarFoto.style.display = 'none';
+            if (DOM.btnCancelarCamera) DOM.btnCancelarCamera.style.display = 'none';
+        }
+
+        async function capturarImagem() {
+            if (!DOM.cameraVideo || !DOM.cameraCanvas || !DOM.btnTirarFoto || !DOM.btnCancelarCamera) return;
+
+            // Para iOS/iPhones, o acesso à câmera pode ser limitado.
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                 showCustomAlert('Seu navegador não suporta captura de câmera ou o acesso foi negado.');
+                 return;
+            }
+
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                
+                DOM.cameraVideo.srcObject = videoStream;
+                DOM.cameraVideo.style.display = 'block';
+                DOM.btnTirarFoto.style.display = 'inline-flex';
+                DOM.btnCancelarCamera.style.display = 'inline-flex';
+                DOM.fotoPreview.style.display = 'none';
+                
+                DOM.btnTirarFoto.onclick = () => {
+                    if (!DOM.cameraVideo || !DOM.cameraCanvas) return;
+
+                    const video = DOM.cameraVideo;
+                    const canvas = DOM.cameraCanvas;
+
+                    // Ajusta o tamanho do canvas para o tamanho do vídeo
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    // Converte para Base64 e define como preview
+                    const fotoBase64 = canvas.toDataURL('image/png');
+                    DOM.fotoPreview.src = fotoBase64;
+                    DOM.fotoPreview.style.display = 'block';
+                    
+                    // Para o stream
+                    stopCamera();
+                };
+                
+                DOM.btnCancelarCamera.onclick = stopCamera;
+
+            } catch (err) {
+                console.error("Erro ao acessar a câmera: ", err);
+                showCustomAlert('Erro ao acessar a câmera. Verifique as permissões.');
+                stopCamera();
+            }
+        }
+
+
+        // --- Funções de Importação/Exportação/Relatórios ---
+        
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function exportDataToJson() {
+            const dataString = JSON.stringify(rebanhoData, null, 2);
+            downloadFile(dataString, `rebanho_backup_${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+            showCustomAlert('Dados exportados com sucesso!');
+        }
+        
+        function importDataFromJson(event) {
+            event.preventDefault();
+            const file = DOM.inputImportarDados.files[0];
+            if (!file) return;
+
+            if (!file.name.endsWith('.json')) {
+                showCustomAlert('Por favor, selecione um arquivo JSON válido.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData.animais && importedData.producaoLeite && importedData.tarefas) {
+                        showCustomConfirm('ATENÇÃO: Isso substituirá TODOS os dados atuais. Deseja continuar?', () => {
+                            rebanhoData = importedData;
+                            // Garante que o nextAnimalId seja consistente
+                            const maxId = rebanhoData.animais.reduce((max, a) => Math.max(max, a.id), 0);
+                            rebanhoData.nextAnimalId = maxId + 1;
+                            saveData();
+                            DOM.inputImportarDados.value = ''; // Limpa o input
+                            DOM.btnImportarDados.disabled = true;
+                            showCustomAlert('Dados importados com sucesso! A aplicação foi atualizada.');
+                        });
+                    } else {
+                        showCustomAlert('O arquivo JSON não parece ser um backup válido do rebanho.');
+                    }
+                } catch (error) {
+                    showCustomAlert('Erro ao processar o arquivo JSON: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function importDataFromCsv(event) {
+             event.preventDefault();
+            DOM.modalImportarCsv.style.display = 'none';
+
+            const file = DOM.inputImportarCsv.files[0];
+            if (!file) {
+                 showCustomAlert('Nenhum arquivo CSV selecionado.');
+                 return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csvContent = e.target.result;
+                    const lines = csvContent.split('\n').filter(line => line.trim() !== '');
+                    
+                    if (lines.length <= 1) {
+                         showCustomAlert('O arquivo CSV está vazio ou tem apenas o cabeçalho.');
+                         return;
+                    }
+
+                    // Ignora o cabeçalho (primeira linha)
+                    const dataLines = lines.slice(1);
+                    const importedAnimais = [];
+                    
+                    dataLines.forEach(line => {
+                        const values = line.split(';').map(v => v.trim()); // Assume separador ';'
+                        
+                        // O CSV deve ter pelo menos ID, Nome, Raça, Categoria, Peso, DataNasc (6 colunas)
+                        if (values.length >= 6) {
+                            const [idStr, nome, raca, categoria, pesoStr, dataNasc, dataAquisicao, statusReprodutivo, dataUltimoParto, dataSecagem, dataPrevisaoParto] = values;
+                            
+                            // Tenta parsear o ID como número. Se for um ID de texto, ignora e o sistema atribuirá um novo.
+                            let id = parseInt(idStr) || null;
+                            const peso = parseFloat(pesoStr) || 0;
+                            
+                            // Adiciona como novo animal (ignora ID do CSV e deixa o sistema atribuir)
+                            const newAnimal = {
+                                id: null, // Será atribuído depois
+                                nome,
+                                raca,
+                                categoria,
+                                peso,
+                                dataNasc,
+                                dataAquisicao: dataAquisicao || '',
+                                fotoBase64: '',
+                                statusReprodutivo: statusReprodutivo || (['Vaca', 'Novilha'].includes(categoria) ? 'Vazia' : 'N/A'),
+                                dataUltimoParto: dataUltimoParto || '',
+                                dataSecagem: dataSecagem || '',
+                                dataPrevisaoParto: dataPrevisaoParto || '',
+                            };
+                            importedAnimais.push(newAnimal);
+                        }
+                    });
+
+                    if (importedAnimais.length > 0) {
+                        showCustomConfirm(`ATENÇÃO: ${importedAnimais.length} animais serão adicionados ao rebanho. Deseja continuar?`, () => {
+                            importedAnimais.forEach(animal => {
+                                animal.id = rebanhoData.nextAnimalId++; // Atribui novo ID
+                                rebanhoData.animais.push(animal);
+                            });
+                            saveData();
+                            DOM.inputImportarCsv.value = '';
+                            showCustomAlert(`${importedAnimais.length} animais importados com sucesso!`);
+                        });
+                    } else {
+                        showCustomAlert('Nenhum animal válido encontrado no arquivo CSV.');
+                    }
+
+                } catch (error) {
+                    showCustomAlert('Erro ao processar o arquivo CSV: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function resetAllData() {
+            showCustomConfirm('ATENÇÃO: Você tem certeza que deseja APAGAR TODOS os dados do rebanho?', () => {
+                rebanhoData = {
+                    animais: [],
+                    producaoLeite: [],
+                    tarefas: [],
+                    lactacoes: [],
+                    nextAnimalId: 1
+                };
+                localStorage.removeItem(STORAGE_KEY);
+                showCustomAlert('Todos os dados foram resetados.');
+                
+                // Recarrega a aplicação
+                loadData();
+                showSection('dashboard');
+                window.location.reload(); 
+            });
+        }
+        
+        function exportToCsv() {
+             let csvContent = "ID;Nome;Raça;Categoria;Peso;DataNasc;DataAquisicao;StatusReprodutivo;DataUltimoParto;DataSecagem;DataPrevisaoParto\n";
+             
+             rebanhoData.animais.forEach(animal => {
+                 const linha = [
+                     formatAnimalId(animal.id),
+                     animal.nome,
+                     animal.raca,
+                     animal.categoria,
+                     animal.peso,
+                     animal.dataNasc,
+                     animal.dataAquisicao,
+                     animal.statusReprodutivo,
+                     animal.dataUltimoParto,
+                     animal.dataSecagem,
+                     animal.dataPrevisaoParto
+                 ].join(';');
+                 csvContent += linha + '\n';
+             });
+             
+             downloadFile(csvContent, `rebanho_animais_${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8;');
+             showCustomAlert('Animais exportados para CSV com sucesso!');
+        }
+        
+        function generateReportPdf() {
+            // Requer jspdf e jspdf-autotable
+            if (typeof jspdf === 'undefined' || typeof jsPDF.autoTable === 'undefined') {
+                 showCustomAlert('Erro: Bibliotecas de PDF não carregadas.');
+                 return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const pageHeight = doc.internal.pageSize.height;
+            let y = 15;
+            
+            doc.setFontSize(18);
+            doc.setTextColor('#28a745');
+            doc.text("Relatório do Rebanho Leiteiro", 15, y);
+            y += 10;
+            
+            // --- Resumo (Metrics) ---
+            doc.setFontSize(12);
+            doc.setTextColor(52, 58, 64);
+            doc.text(`Total de Animais: ${rebanhoData.animais.length}`, 15, y);
+            doc.text(`Vacas em Lactação: ${rebanhoData.animais.filter(a => a.categoria === 'Vaca' && a.statusReprodutivo === 'Em Lactação').length}`, 100, y);
+            y += 7;
+            doc.text(`Tarefas Pendentes: ${rebanhoData.tarefas.filter(t => !t.done).length}`, 15, y);
+            y += 10;
+
+            // --- Tabela de Animais ---
+            doc.setFontSize(14);
+            doc.setTextColor('#007bff');
+            doc.text("Animais Cadastrados", 15, y);
+            y += 5;
+            
+            const animalHeaders = [["ID", "Nome", "Categoria", "Idade", "Status Repr."]];
+            const animalData = rebanhoData.animais.map(animal => [
+                formatAnimalId(animal.id),
+                animal.nome,
+                animal.categoria,
+                calculateAge(animal.dataNasc),
+                animal.statusReprodutivo || animal.categoria
+            ]);
+
+            doc.autoTable({
+                startY: y,
+                head: animalHeaders,
+                body: animalData,
+                styles: { fontSize: 10, cellPadding: 2, overflow: 'linebreak' },
+                headStyles: { fillColor: [0, 123, 255] },
+                margin: { left: 15, right: 15 },
+                didDrawPage: function (data) {
+                    // Footer
+                    doc.setFontSize(10);
+                    doc.text('Página ' + doc.internal.getNumberOfPages(), data.settings.margin.left, pageHeight - 10);
+                }
+            });
+            
+            y = doc.autoTable.previous.finalY + 10;
+            
+            // --- Tabela de Tarefas Pendentes ---
+            doc.setFontSize(14);
+            doc.setTextColor('#ffc107');
+            doc.text("Tarefas Pendentes", 15, y);
+            y += 5;
+            
+            const tarefaHeaders = [["Data", "Animal", "Tipo", "Descrição"]];
+            const tarefaData = rebanhoData.tarefas
+                .filter(t => !t.done)
+                .sort((a, b) => new Date(a.data) - new Date(b.data))
+                .map(tarefa => {
+                    const animal = rebanhoData.animais.find(a => a.id === tarefa.animalId);
+                    const animalNome = animal ? `${formatAnimalId(animal.id)} - ${animal.nome}` : 'Animal Excluído';
+                    return [
+                        new Date(tarefa.data).toLocaleDateString(),
+                        animalNome,
+                        tarefa.tipo,
+                        tarefa.descricao
+                    ];
+                });
+
+             doc.autoTable({
+                startY: y,
+                head: tarefaHeaders,
+                body: tarefaData,
+                styles: { fontSize: 10, cellPadding: 2, overflow: 'linebreak' },
+                headStyles: { fillColor: [255, 193, 7] },
+                margin: { left: 15, right: 15 },
+                didDrawPage: function (data) {
+                    // Footer
+                    doc.setFontSize(10);
+                    doc.text('Página ' + doc.internal.getNumberOfPages(), data.settings.margin.left, pageHeight - 10);
+                }
+            });
+
+            doc.save(`Relatorio_Rebanho_${new Date().toISOString().split('T')[0]}.pdf`);
+            showCustomAlert('Relatório PDF gerado com sucesso!');
+        }
+
+
+        // --- Funções de Modal (Alerta/Confirmação Customizados) ---
+        
+        // CORREÇÃO: Estas funções foram ajustadas para garantir que usem document.body e tenham verificações de nulidade para evitar o erro 'Cannot read properties of null (reading 'prepend')'.
+
+        function showCustomAlert(message) {
+            // Remove qualquer alerta existente
+            const existingAlert = document.querySelector('.custom-alert-overlay');
+            if (existingAlert) existingAlert.remove();
+
+            const overlay = document.createElement('div');
+            overlay.className = 'custom-alert-overlay';
+            
+            const alertBox = document.createElement('div');
+            alertBox.className = 'custom-alert-box';
+            
+            alertBox.innerHTML = `
+                <div class="custom-alert-icon"><i class="ph ph-bell-ringing"></i></div>
+                <div class="custom-alert-message">${message}</div>
+                <div class="custom-alert-actions">
+                    <button class="btn btn-primary" id="custom-alert-ok-btn">OK</button>
+                </div>
+            `;
+            
+            alertBox.querySelector('#custom-alert-ok-btn').addEventListener('click', () => {
+                overlay.classList.remove('show');
+                setTimeout(() => overlay.remove(), 300);
+            });
+            
+            overlay.appendChild(alertBox);
+
+            const container = document.body;
+            if (container) {
+                container.prepend(overlay);
+                setTimeout(() => overlay.classList.add('show'), 10); // Adiciona a classe show após o prepend
+            } else {
+                 console.error("Erro: document.body não encontrado para prepend.");
+            }
+        }
+
+        function showCustomConfirm(message, onConfirm) {
+            // Remove qualquer alerta existente
+            const existingAlert = document.querySelector('.custom-alert-overlay');
+            if (existingAlert) existingAlert.remove();
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'custom-alert-overlay';
+            
+            const alertBox = document.createElement('div');
+            alertBox.className = 'custom-alert-box confirm';
+            
+            alertBox.innerHTML = `
+                <div class="custom-alert-icon"><i class="ph ph-warning"></i></div>
+                <div class="custom-alert-message">${message}</div>
+                <div class="custom-alert-actions">
+                    <button class="btn btn-danger" id="custom-confirm-yes-btn">Sim</button>
+                    <button class="btn btn-secondary" id="custom-confirm-no-btn">Não</button>
+                </div>
+            `;
+            
+            const close = () => {
+                overlay.classList.remove('show');
+                setTimeout(() => overlay.remove(), 300);
+            };
+            
+            alertBox.querySelector('#custom-confirm-yes-btn').addEventListener('click', () => {
+                onConfirm();
+                close();
+            });
+            
+            alertBox.querySelector('#custom-confirm-no-btn').addEventListener('click', close);
+            
+            overlay.appendChild(alertBox);
+
+            const container = document.body;
+            if (container) {
+                container.prepend(overlay);
+                setTimeout(() => overlay.classList.add('show'), 10);
+            } else {
+                 console.error("Erro: document.body não encontrado para prepend.");
+            }
+        }
+
+
+        // --- Listeners de Eventos ---
+        
+        // Navegação
+        DOM.navLinks.forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                showSection(link.dataset.section);
+            });
+        });
+
+        // Formulários
+        if (DOM.animalForm) {
+            DOM.animalForm.addEventListener('submit', saveAnimal);
+        }
+        if (DOM.leiteForm) {
+            DOM.leiteForm.addEventListener('submit', saveLeiteRegistro);
+        }
+        if (DOM.tarefaForm) {
+            DOM.tarefaForm.addEventListener('submit', saveTarefa);
+        }
+        
+        // Filtros e Busca de Animais
+        if (DOM.filtroCategoriaSelect) {
+            DOM.filtroCategoriaSelect.addEventListener('change', renderAnimalList);
+        }
+        if (DOM.buscaAnimalInput) {
+            DOM.buscaAnimalInput.addEventListener('input', renderAnimalList);
+        }
+
+        // Configurações e Ações Globais
+        if (DOM.idPrefixForm) {
+            DOM.idPrefixForm.addEventListener('submit', (event) => {
+                event.preventDefault(); // Evita o envio do formulário
+                const newPrefix = DOM.idPrefixInput.value.toUpperCase();
+                if (newPrefix.length > 0 && newPrefix.length <= 5) {
+                    localStorage.setItem('idPrefix', newPrefix);
+                    DOM.currentIdPrefix.textContent = newPrefix;
+                    showCustomAlert(`Prefixo de ID salvo como: ${newPrefix}`);
+                    renderAnimalList(); // Re-renderiza para mostrar os IDs atualizados
+                } else {
+                    showCustomAlert('O prefixo deve ter entre 1 e 5 caracteres.');
+                }
+            });
+        }
+        
+        // Exibe/Oculta campos condicionais do formulário de Animal
+        if (DOM.animalCategoriaSelect && DOM.vacaFields) {
+            DOM.animalCategoriaSelect.addEventListener('change', () => {
+                const categoria = DOM.animalCategoriaSelect.value;
+                DOM.vacaFields.style.display = (categoria === 'Vaca' || categoria === 'Novilha') ? 'block' : 'none';
+            });
+        }
+        
+        // Visualização do Animal - Tabs
+        if (DOM.animalViewTabsContainer) {
+            DOM.animalViewTabsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('animal-view-tab-btn')) {
+                    document.querySelectorAll('#animal-view-tabs button').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('#modal-animal-view .animal-view-tab-content').forEach(content => content.style.display = 'none');
+                    
+                    e.target.classList.add('active');
+                    const tabId = e.target.dataset.tab;
+                    const tabContent = document.getElementById(tabId);
+                    if (tabContent) {
+                        tabContent.style.display = 'block';
+                    }
+                }
+            });
+        }
+
+        // Importação de Dados
+        if (DOM.btnImportarDadosModal) {
+            DOM.btnImportarDadosModal.addEventListener('click', () => {
+                 DOM.modalAnimalForm.style.display = 'none'; // Fecha o de animal se estiver aberto
+                 document.getElementById('modal-importar-csv').style.display='none';
+                 
+                 // Abrir o modal de importação JSON (que na verdade usa o input na seção de config)
+                 showSection('config'); // Leva para a seção de config onde está o input
+            });
+        }
+        
+        if (DOM.inputImportarDados) {
+            DOM.inputImportarDados.addEventListener('change', (event) => {
+                if (DOM.btnImportarDados) {
+                    DOM.btnImportarDados.disabled = event.target.files.length === 0;
+                }
+            });
+        }
+        if (DOM.btnImportarDados) {
+            DOM.btnImportarDados.addEventListener('click', importDataFromJson);
+        }
+        
+        if (DOM.btnImportarCsvModal) {
+            DOM.btnImportarCsvModal.addEventListener('click', () => {
+                DOM.modalImportarCsv.style.display = 'flex';
+            });
+        }
+        if (DOM.inputImportarCsv) {
+            DOM.inputImportarCsv.addEventListener('change', (event) => {
+                if (DOM.btnImportarCsv) {
+                     DOM.btnImportarCsv.disabled = event.target.files.length === 0;
+                }
+            });
+        }
+        if (DOM.btnImportarCsv) {
+            DOM.btnImportarCsv.addEventListener('click', importDataFromCsv);
+        }
+        
+        // Botões de Ação Global
+        if (DOM.btnExportarJson) {
+            DOM.btnExportarJson.addEventListener('click', exportDataToJson);
+        }
+        if (DOM.btnExportarCsv) {
+            DOM.btnExportarCsv.addEventListener('click', exportToCsv);
+        }
+        if (DOM.btnGerarRelatorioPdf) {
+            DOM.btnGerarRelatorioPdf.addEventListener('click', generateReportPdf);
+        }
+        
+        // Listener de Reset (CORRIGIDO com verificação de nulidade)
+        const resetBtn = document.getElementById('reset-data-btn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', resetAllData);
+        }
+
+        // Inicialização da Aplicação
+        window.onload = function() {
+            loadData();
+            initCharts();
+            populateSelects(); // Preenche os selects após carregar os dados
+            renderAnimalList(); // Garante que a lista de animais seja renderizada
+
+            // Verifica a seção na URL e exibe, ou vai para o Dashboard
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'dashboard';
+            showSection(initialSection);
+
+            // Inicializa data da tarefa e leite
+            const today = new Date().toISOString().split('T')[0];
+            if (DOM.leiteDataInput) DOM.leiteDataInput.value = today;
+            if (DOM.tarefaData) DOM.tarefaData.value = today;
+            
+            // Corrige o bug de campos de reprodução ao carregar o form para novo animal
+             if (DOM.animalCategoriaSelect && DOM.vacaFields) {
+                const categoria = DOM.animalCategoriaSelect.value;
+                DOM.vacaFields.style.display = (categoria === 'Vaca' || categoria === 'Novilha') ? 'block' : 'none';
+            }
+        };
+
+        // Exposição de funções globais para handlers inline no HTML (necessário)
+        window.viewAnimal = viewAnimal;
+        window.editAnimal = openAnimalForm;
+        window.deleteAnimal = deleteAnimal;
+        window.previewFoto = previewFoto;
+        window.capturarImagem = capturarImagem;
+        window.openAnimalForm = openAnimalForm;
+        window.showCustomAlert = showCustomAlert;
+        window.showCustomConfirm = showCustomConfirm;
+        window.exportDataToJson = exportDataToJson;
+        window.importDataFromJson = importDataFromJson; // Chamado pelo listener
+        window.importDataFromCsv = importDataFromCsv; // Chamado pelo listener
+        window.resetAllData = resetAllData;
+        window.generateReportPdf = generateReportPdf;
+        window.exportToCsv = exportToCsv;
+        window.markTarefaAsDone = markTarefaAsDone;
+        window.deleteTarefa = deleteTarefa;
+        window.deleteLeiteRegistro = deleteLeiteRegistro;
+        window.deleteLactacaoRegistro = deleteLactacaoRegistro;
+        
+    </script>
+
+</body>
+</html>
