@@ -727,7 +727,7 @@
 
         <section id="animais" class="page-section">
             <h2 class="section-title">Cadastro de Animais</h2>
-
+<form name="Animais" = "POST" data-netlify="true"></form>
             <div class="card">
                 <div class="card-header">
                     Lista de Animais
@@ -924,7 +924,6 @@
             </div>
         </section>
 
-
         <div id="modal-animal-form" class="modal">
             <div class="modal-content">
                 <span class="modal-close" onclick="document.getElementById('modal-animal-form').style.display='none'">&times;</span>
@@ -938,18 +937,19 @@
                     </div>
                     <div class="form-group">
                         <label for="animal-raca">Raça:</label>
-                        <input type="text" id="animal-raca" required>
+                        <input type="text" id="animal-raca" >
                     </div>
-                    <div class="form-group">
-                        <label for="animal-categoria-select">Categoria:</label>
-                        <select id="animal-categoria-select" required>
-                            <option value="">Selecione...</option>
-                            <option value="Vaca">Vaca</option>
-                            <option value="Novilha">Novilha</option>
-                            <option value="Bezerro(a)">Bezerro(a)</option>
-                            <option value="Boi">Boi</option>
-                        </select>
+                   <div class="form-group">
+                        <label for="animal-categoria-select">Categoria (preenchimento automático):</label>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input type="text" id="animal-categoria-select" readonly required
+                                   placeholder="Preenchida automaticamente a partir da data de nascimento e sexo"
+                                   style="flex:1;">
+                            <button type="button" class="btn btn-sm btn-secondary" id="animal-categoria-edit-btn" title="Editar categoria" style="white-space:nowrap;">Editar</button>
+                        </div>
+                        <small style="display:block; color:#6c757d; margin-top:6px;">A categoria será preenchida automaticamente ao informar Data de Nascimento e Sexo. Use 'Editar' apenas para correções manuais.</small>
                     </div>
+
                     <div class="form-group">
                         <label for="animal-sexo-select">Sexo:</label>
                         <select id="animal-sexo-select" required>
@@ -1245,6 +1245,7 @@
             animalNomeInput: document.getElementById('animal-nome'),
             animalRacaInput: document.getElementById('animal-raca'),
             animalCategoriaSelect: document.getElementById('animal-categoria-select'),
+            animalCategoriaEditBtn: document.getElementById('animal-categoria-edit-btn'),
             animalPesoInput: document.getElementById('animal-peso'),
             animalDataNascInput: document.getElementById('animal-data-nasc'),
             animalDataAquisicaoInput: document.getElementById('animal-data-aquisicao'),
@@ -1360,9 +1361,49 @@
     }
     return ageMonths > 0 ? ageMonths : 0;
 }
+function classifyCategory(dateOfBirth, sexo) {
+    const months = calculateAgeInMonths(dateOfBirth);
+    const s = (sexo || '').toLowerCase();
+    const isFemale = s.startsWith('f') || s.includes('femea') || s.includes('fêmea') || s.includes('feminino');
+    const isMale = s.startsWith('m') || s.includes('macho') || s.includes('masculino');
 
+    // 0 a 3 meses: amamentação (Bezerro/Bezerra)
+    if (months <= 3) {
+        return isFemale ? 'Bezerra (amamentação)' : 'Bezerro (amamentação)';
+    }
+
+    // 3 a 8 meses: desmame (mantém Bezerro/Bezerra, fase de desmame)
+    if (months > 3 && months < 8) {
+        return isFemale ? 'Bezerra (desmame)' : 'Bezerro (desmame)';
+    }
+
+    // 8 a 12 meses: Garrote (macho) / Novilha (fêmea)
+    if (months >= 8 && months < 12) {
+        return isFemale ? 'Novilha' : 'Garrote';
+    }
+
+    // 12 a 24 meses: Novilho (macho) / Novilha (fêmea) — puberdade / preparo para 1ª cobertura
+    if (months >= 12 && months < 24) {
+        return isFemale ? 'Novilha' : 'Novilho';
+    }
+
+    // 24 a 36 meses: jovem adulto (mantém Novilha/Novilho até maturidade reprodutiva)
+    if (months >= 24 && months < 36) {
+        return isFemale ? 'Novilha' : 'Novilho';
+    }
+
+    // Acima de 36 meses: adulto — fêmea normalmente "Vaca" após parto; macho "Boi/Touro"
+    // Observação: se quiser exigir primeiro parto para chamar 'Vaca', passe informação adicional ao chamar a função.
+    if (months >= 36) {
+        if (isFemale) return 'Vaca';
+        if (isMale) return 'Boi/Touro';
+        return 'Adulto';
+    }
+
+    return 'N/D';
+}
        // Atualiza o select de categoria com base na data de nascimento e sexo do form
-       function updateCategoryFromDobSex() {
+      function updateCategoryFromDobSex() {
            if (!DOM.animalDataNascInput || !DOM.animalSexoSelect || !DOM.animalCategoriaSelect) return;
            const dob = DOM.animalDataNascInput.value;
            const sexo = DOM.animalSexoSelect.value;
@@ -1370,12 +1411,13 @@
            if (cat) {
                // Preenche automaticamente (mas permite alteração manual)
                DOM.animalCategoriaSelect.value = cat;
-               // Ajusta visibilidade de campos de vaca/novilha quando aplicável
-               const isVacaOrNovilha = cat === 'Vaca' || cat === 'Novilha';
-               DOM.vacaFields.style.display = isVacaOrNovilha ? 'block' : 'none';
            }
+           // Ajusta visibilidade de campos de vaca/novilha quando aplicável (sempre verificar o valor atual, pois usuário pode ter editado)
+           const currentCat = DOM.animalCategoriaSelect.value;
+           const isVacaOrNovilha = currentCat === 'Vaca' || currentCat === 'Novilha';
+           DOM.vacaFields.style.display = isVacaOrNovilha ? 'block' : 'none';
        }
-
+       
         // Função para calcular Dias em Leite (DEL) (NOVO)
         function calculateDaysInMilk(lastCalvingDate) {
             if (!lastCalvingDate) return null;
@@ -1873,18 +1915,27 @@
             DOM.vacaFields.style.display = 'none';
             
             // Listener temporário para mostrar/esconder campos de Vaca/Novilha
-            DOM.animalCategoriaSelect.onchange = () => {
-                const isVacaOrNovilha = DOM.animalCategoriaSelect.value === 'Vaca' || DOM.animalCategoriaSelect.value === 'Novilha';
-                DOM.vacaFields.style.display = isVacaOrNovilha ? 'block' : 'none';
-                if (!isVacaOrNovilha) {
+            //DOM.animalCategoriaSelect.onchange = () => {
+               // const isVacaOrNovilha = DOM.animalCategoriaSelect.value === 'Vaca' || DOM.animalCategoriaSelect.value === 'Novilha';
+                //DOM.vacaFields.style.display = isVacaOrNovilha ? 'block' : 'none';
+               // if (!isVacaOrNovilha) {
                     // Limpar campos se a categoria mudar
-                    DOM.animalStatusReprodutivo.value = 'Vazia';
-                    DOM.animalDataUltimoParto.value = '';
-                    DOM.animalDataSecagem.value = '';
-                    DOM.animalDataPrevisaoParto.value = '';
-                }
-            };
-            
+          //          //DOM.animalStatusReprodutivo.value = 'Vazia';
+                    //DOM.animalDataUltimoParto.value = '';
+           //        // DOM.animalDataSecagem.value = '';
+                    //DOM.animalDataPrevisaoParto.value = '';
+               // }
+            //};
+            // Garante que o campo categoria seja exibido corretamente ao abrir o formulário
+            const openCat = DOM.animalCategoriaSelect.value;
+            const isVacaOrNovilhaOpen = openCat === 'Vaca' || openCat === 'Novilha';
+            DOM.vacaFields.style.display = isVacaOrNovilhaOpen ? 'block' : 'none';
+            if (!isVacaOrNovilhaOpen) {
+                DOM.animalStatusReprodutivo.value = 'Vazia';
+                DOM.animalDataUltimoParto.value = '';
+                DOM.animalDataSecagem.value = '';
+                DOM.animalDataPrevisaoParto.value = '';
+            }
             if (animalId) {
                 const animal = rebanhoData.animais.find(a => a.id === animalId);
                 if (animal) {
@@ -3045,7 +3096,43 @@
             
             if (DOM.animalDataNascInput) DOM.animalDataNascInput.addEventListener('change', updateCategoryFromDobSex);
             if (DOM.animalSexoSelect) DOM.animalSexoSelect.addEventListener('change', updateCategoryFromDobSex);
-            
+            if (DOM.animalCategoriaSelect) {
+                DOM.animalCategoriaSelect.addEventListener('input', () => {
+                    const cat = DOM.animalCategoriaSelect.value;
+                    const isVacaOrNovilha = cat === 'Vaca' || cat === 'Novilha';
+                    DOM.vacaFields.style.display = isVacaOrNovilha ? 'block' : 'none';
+                    if (!isVacaOrNovilha) {
+                        DOM.animalStatusReprodutivo.value = 'Vazia';
+                        DOM.animalDataUltimoParto.value = '';
+                        DOM.animalDataSecagem.value = '';
+                        DOM.animalDataPrevisaoParto.value = '';
+                    }
+                });
+            }
+            // Botão para habilitar edição manual da categoria
+            if (DOM.animalCategoriaEditBtn && DOM.animalCategoriaSelect) {
+                DOM.animalCategoriaEditBtn.addEventListener('click', () => {
+                    const input = DOM.animalCategoriaSelect;
+                    const btn = DOM.animalCategoriaEditBtn;
+                    if (input.readOnly) {
+                        input.readOnly = false;
+                        input.focus();
+                        btn.textContent = 'Salvar';
+                        btn.classList.remove('btn-secondary');
+                        btn.classList.add('btn-primary');
+                    } else {
+                        // Ao salvar, volta para readonly e atualiza UI conforme valor informado
+                        input.readOnly = true;
+                        btn.textContent = 'Editar';
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-secondary');
+                        // aplica comportamento (mostra/oculta campos de vaca)
+                        const cat = input.value;
+                        const isVacaOrNovilha = cat === 'Vaca' || cat === 'Novilha';
+                        DOM.vacaFields.style.display = isVacaOrNovilha ? 'block' : 'none';
+                    }
+                });
+            }
             // Formulários
             DOM.animalForm.addEventListener('submit', saveAnimal);
             DOM.leiteForm.addEventListener('submit', saveLeite);
