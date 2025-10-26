@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <!-- METADADOS E TÍTULO -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciador de Rebanho Leiteiro - Meu App Completo</title>
 
-    <!-- BIBLIOTECAS EXTERNAS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     
-    <!-- ÍCONES (Phosphor Icons) -->
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
-    <!-- ESTILOS -->
     <style>
         /* Copiado integralmente do estilo original (mantive todos os estilos e adicionei pequenos ajustes visuais para timeline e histórico) */
         :root {
@@ -270,6 +266,15 @@
             background-color: #e0a800;
         }
         
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+        
+        .btn-info:hover {
+             background-color: #117a8b;
+        }
+        
         .btn-sm {
             padding: 0.5rem 0.8rem;
             font-size: 0.875rem;
@@ -332,6 +337,11 @@
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
+        }
+        
+        /* Ajuste para o Modal de Relatórios ser um pouco maior */
+        #modal-relatorios-pdf .modal-content {
+            max-width: 700px;
         }
 
         .modal-close {
@@ -427,7 +437,15 @@
             border: 4px solid #e9ecef;
         }
 
-        .animal-details dt {
+        .animal-thumb {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            display: inline-block;
+        }
+            .animal-details dt {
             font-weight: 700;
             color: var(--secondary-color);
             margin-top: 1rem;
@@ -632,7 +650,6 @@
     </header>
 
     <div class="container">
-        <!-- Navegação Principal -->
         <nav class="nav">
             <a href="#dashboard" class="nav-link active" data-section="dashboard"><i class="ph ph-chart-bar"></i> Dashboard</a>
             <a href="#animais" class="nav-link" data-section="animais"><i class="ph ph-list-numbers"></i> Animais</a>
@@ -641,9 +658,6 @@
             <a href="#config" class="nav-link" data-section="config"><i class="ph ph-gear-six"></i> Configurações</a>
         </nav>
 
-        <!-- --- SEÇÕES DA PÁGINA --- -->
-
-        <!-- 1. DASHBOARD -->
         <section id="dashboard" class="page-section active">
             <h2 class="section-title">Dashboard</h2>
 
@@ -667,7 +681,6 @@
             </div>
 
             <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
-                <!-- Gráficos -->
                 <div class="card">
                     <div class="card-header">Produção Diária (Últimas 4 Semanas)</div>
                     <div class="card-body">
@@ -675,19 +688,16 @@
                     </div>
                 </div>
                 
-                <!-- Próximas Tarefas -->
                 <div class="card">
                     <div class="card-header">Próximas Tarefas</div>
                     <div class="card-body">
                         <ul class="tarefa-list" id="proximas-tarefas-lista">
-                            <!-- Lista de tarefas será injetada aqui -->
                             <p class="text-secondary">Nenhuma tarefa pendente.</p>
                         </ul>
                         <button class="btn btn-primary btn-sm" onclick="showSection('saude')"><i class="ph ph-plus"></i> Gerenciar Tarefas</button>
                     </div>
                 </div>
 
-                <!-- Próximos Eventos (Reprodução) -->
                 <div class="card" style="grid-column: 1 / -1;">
                     <div class="card-header">Próximos Eventos de Reprodução</div>
                     <div class="card-body">
@@ -695,20 +705,17 @@
                             <div>
                                 <h4 style="color:var(--danger-color);">Próximos Partos (30 dias)</h4>
                                 <ul class="tarefa-list" id="proximos-partos-lista">
-                                    <!-- Lista de partos será injetada aqui -->
-                                </ul>
+                                    </ul>
                             </div>
                             <div>
                                 <h4 style="color:var(--warning-color);">Próximos Cio (30 dias)</h4>
                                 <ul class="tarefa-list" id="proximos-cio-lista">
-                                    <!-- Lista de cio será injetada aqui -->
-                                </ul>
+                                    </ul>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Distribuição por Categoria -->
                 <div class="card" style="grid-column: 1 / -1;">
                     <div class="card-header">Distribuição do Rebanho por Categoria</div>
                     <div class="card-body" style="max-width: 500px; margin: 0 auto;">
@@ -718,7 +725,6 @@
             </div>
         </section>
 
-        <!-- 2. ANIMAIS -->
         <section id="animais" class="page-section">
             <h2 class="section-title">Cadastro de Animais</h2>
 
@@ -742,29 +748,29 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Nome</th>
-                                    <th>Categoria</th>
+                                   <th>ID</th>
+                                   <th>Foto</th>
+                                   <th>Nome</th>
+                                   <th>Sexo</th>
+                                   <th>Pai / Mãe</th>
+                                   <th>Categoria</th>
                                     <th>Idade</th>
                                     <th>Status Repr.</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="animal-list-tbody">
-                                <!-- Dados dos animais serão injetados aqui -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 3. PRODUÇÃO DE LEITE -->
         <section id="producao" class="page-section">
             <h2 class="section-title">Registro de Produção de Leite</h2>
 
             <div class="dashboard-grid">
-                <!-- Formulário de Registro de Leite -->
                 <div class="card">
                     <div class="card-header">Registrar Produção Diária</div>
                     <div class="card-body">
@@ -783,8 +789,7 @@
                             <div class="form-group">
                                 <label for="leite-vaca-select">Vaca (em Lactação):</label>
                                 <select id="leite-vaca-select" required>
-                                    <!-- População via JS -->
-                                </select>
+                                    </select>
                             </div>
                             <div class="form-group">
                                 <label for="leite-quantidade-input">Quantidade (Litros):</label>
@@ -795,8 +800,7 @@
                     </div>
                 </div>
 
-                <!-- Histórico de Produção (Lista) -->
-                 <div class="card">
+                <div class="card">
                     <div class="card-header">Últimos Registros de Leite</div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -811,8 +815,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="leite-list-tbody">
-                                    <!-- Registros de leite serão injetados aqui -->
-                                </tbody>
+                                    </tbody>
                             </table>
                         </div>
                     </div>
@@ -820,12 +823,10 @@
             </div>
         </section>
 
-        <!-- 4. SAÚDE E REPRODUÇÃO (TAREFAS) -->
         <section id="saude" class="page-section">
             <h2 class="section-title">Saúde e Reprodução (Tarefas)</h2>
 
             <div class="dashboard-grid" style="grid-template-columns: 1fr 2fr;">
-                <!-- Formulário de Tarefas -->
                 <div class="card">
                     <div class="card-header">Registrar Nova Tarefa</div>
                     <div class="card-body">
@@ -833,8 +834,7 @@
                             <div class="form-group">
                                 <label for="tarefa-animal-select">Animal:</label>
                                 <select id="tarefa-animal-select" required>
-                                    <!-- População via JS -->
-                                </select>
+                                    </select>
                             </div>
                             <div class="form-group">
                                 <label for="tarefa-tipo-select">Tipo de Tarefa/Evento:</label>
@@ -861,7 +861,6 @@
                     </div>
                 </div>
 
-                <!-- Lista de Tarefas -->
                 <div class="card">
                     <div class="card-header">Lista de Tarefas Pendentes</div>
                     <div class="card-body">
@@ -877,8 +876,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tarefa-list-tbody">
-                                    <!-- Tarefas serão injetadas aqui -->
-                                </tbody>
+                                    </tbody>
                             </table>
                         </div>
                     </div>
@@ -886,12 +884,10 @@
             </div>
         </section>
 
-        <!-- 5. CONFIGURAÇÕES -->
         <section id="config" class="page-section">
             <h2 class="section-title">Configurações e Manutenção</h2>
 
             <div class="dashboard-grid" style="grid-template-columns: 1fr;">
-                <!-- Configurações Gerais -->
                 <div class="card">
                     <div class="card-header">Configurações Gerais</div>
                     <div class="card-body">
@@ -908,7 +904,6 @@
                     </div>
                 </div>
 
-                <!-- Backup e Restauração -->
                 <div class="card">
                     <div class="card-header">Backup e Restauração de Dados</div>
                     <div class="card-body">
@@ -920,20 +915,16 @@
                     </div>
                 </div>
                 
-                <!-- Relatórios -->
                 <div class="card">
                     <div class="card-header">Relatórios</div>
                     <div class="card-body">
-                        <button class="btn btn-info" id="btn-gerar-relatorio-pdf"><i class="ph ph-file-pdf"></i> Gerar Relatório PDF</button>
+                        <button class="btn btn-info" id="btn-abrir-modal-relatorio"><i class="ph ph-file-pdf"></i> Gerar Relatório PDF</button>
                     </div>
                 </div>
             </div>
         </section>
 
 
-        <!-- --- MODAIS (Janelas Flutuantes) --- -->
-
-        <!-- Modal de Cadastro/Edição de Animal -->
         <div id="modal-animal-form" class="modal">
             <div class="modal-content">
                 <span class="modal-close" onclick="document.getElementById('modal-animal-form').style.display='none'">&times;</span>
@@ -960,6 +951,31 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="animal-sexo-select">Sexo:</label>
+                        <select id="animal-sexo-select" required>
+                           <option value="">Selecione...</option>
+                            <option value="Fêmea">Fêmea</option>
+                            <option value="Macho">Macho</option>
+                            <option value="Indefinido">Indefinido</option>
+                        </select>
+                    </div>
+                      <!-- Campos Pai / Mãe: selecionar entre animais já cadastrados -->
+                        <div class="form-group" style="display:flex; gap:10px;">
+                            <div style="flex:1;">
+                                <label for="parent-pai-select">Pai (Sire):</label>
+                                <select id="parent-pai-select">
+                                    <option value="">Nenhum</option>
+                                </select>
+                            </div>
+                            <div style="flex:1;">
+                                <label for="parent-mae-select">Mãe (Dam):</label>
+                                <select id="parent-mae-select">
+                                    <option value="">Nenhum</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    <div class="form-group">
                         <label for="animal-peso">Peso (Kg):</label>
                         <input type="number" id="animal-peso" min="0" required>
                     </div>
@@ -972,7 +988,6 @@
                         <input type="date" id="animal-data-aquisicao">
                     </div>
 
-                    <!-- Campos Condicionais para Vacas/Novilhas -->
                     <div id="vaca-fields" style="display: none; border-top: 1px dashed #ccc; padding-top: 10px; margin-top: 10px;">
                         <h4>Detalhes de Reprodução</h4>
                         <div class="form-group">
@@ -997,8 +1012,6 @@
                             <input type="date" id="animal-data-previsao-parto">
                         </div>
                     </div>
-                    
-                    <!-- Campo de Foto -->
                     <div class="form-group">
                         <label for="animal-foto-input">Foto do Animal:</label>
                         <div class="camera-container">
@@ -1011,18 +1024,15 @@
                             <button type="button" class="btn btn-danger btn-sm" id="btn-cancelar-camera" style="display: none;"><i class="ph ph-x-circle"></i> Cancelar Câmera</button>
                         </div>
                     </div>
-
                     <button type="submit" class="btn btn-primary" style="margin-top: 1rem;"><i class="ph ph-floppy-disk"></i> Salvar Animal</button>
                 </form>
             </div>
         </div>
-        
-        <!-- Modal de Visualização do Animal -->
+
         <div id="modal-animal-view" class="modal">
             <div class="modal-content">
                 <span class="modal-close" onclick="document.getElementById('modal-animal-view').style.display='none'">&times;</span>
                 <h3 style="color:var(--primary-color);" id="view-animal-title">Detalhes do Animal</h3>
-                
                 <div class="animal-view-data">
                     <div class="animal-photo-container">
                         <img id="view-animal-foto" src="" alt="Foto do Animal">
@@ -1030,26 +1040,20 @@
                         <button class="btn btn-danger btn-sm" id="btn-delete-view"><i class="ph ph-trash"></i> Excluir</button>
                     </div>
                     <dl class="animal-details" id="view-animal-details">
-                        <!-- Detalhes injetados via JS -->
-                    </dl>
+                        </dl>
                 </div>
-                
                 <div class="animal-view-tabs" id="animal-view-tabs">
                     <button class="animal-view-tab-btn active" data-tab="historico">Histórico de Eventos</button>
                     <button class="animal-view-tab-btn" data-tab="producao-tab">Produção Leiteira</button>
                     <button class="animal-view-tab-btn" data-tab="lactacoes">Registros de Lactação</button>
                 </div>
-                
                 <div id="historico" class="animal-view-tab-content active">
                     <ul class="timeline" id="animal-historico-timeline">
-                        <!-- Histórico injetado via JS -->
-                    </ul>
+                        </ul>
                 </div>
-                
                 <div id="producao-tab" class="animal-view-tab-content">
                     <h4 style="color:var(--secondary-color);">Gráfico de Produção Leiteira</h4>
                     <canvas id="animalProducaoChart" style="max-height: 300px;"></canvas>
-                    
                     <h4 style="margin-top: 15px; color:var(--secondary-color);">Registros de Produção (Últimos 15)</h4>
                     <div class="table-responsive">
                         <table class="data-table">
@@ -1057,36 +1061,30 @@
                                 <tr><th>Data</th><th>Período</th><th>Litros</th><th>Ações</th></tr>
                             </thead>
                             <tbody id="animal-producao-list">
-                                <!-- Produção injetada via JS -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
-
                 <div id="lactacoes" class="animal-view-tab-content">
                     <h4 style="color:var(--secondary-color);">Registros de Lactação</h4>
-                     <div class="table-responsive">
+                    <div class="table-responsive">
                         <table class="data-table">
                             <thead>
                                 <tr><th>Início</th><th>Fim (Secagem)</th><th>Parto Relacionado</th><th>Total (L)</th><th>Ações</th></tr>
                             </thead>
                             <tbody id="animal-lactacoes-list">
-                                <!-- Lactações injetadas via JS -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- Modal de Importação CSV -->
         <div id="modal-importar-csv" class="modal">
             <div class="modal-content">
                 <span class="modal-close" onclick="document.getElementById('modal-importar-csv').style.display='none'">&times;</span>
                 <h3 style="color:var(--secondary-color);">Importar Animais de Arquivo CSV</h3>
                 <p>O arquivo CSV deve ter as seguintes colunas (na ordem): ID, Nome, Raça, Categoria, Peso, DataNasc, DataAquisicao, StatusReprodutivo, DataUltimoParto, DataSecagem, DataPrevisaoParto. Colunas vazias são permitidas.</p>
-                
                 <div class="form-group">
                     <label for="input-importar-csv">Selecionar Arquivo CSV:</label>
                     <input type="file" id="input-importar-csv" accept=".csv" required>
@@ -1094,14 +1092,105 @@
                 <button class="btn btn-primary" id="btn-importar-csv" disabled><i class="ph ph-file-csv"></i> Importar Animais</button>
             </div>
         </div>
+        
+        <div id="modal-relatorios-pdf" class="modal">
+            <div class="modal-content" style="max-width: 700px;">
+                <span class="modal-close" onclick="document.getElementById('modal-relatorios-pdf').style.display='none'">&times;</span>
+                <h3 style="color:var(--primary-color);">Gerar Relatório PDF</h3>
+                
+                <form id="form-relatorio-pdf">
+                    <div class="form-group">
+                        <label for="tipo-relatorio-select">Tipo de Relatório:</label>
+                        <select id="tipo-relatorio-select" required onchange="toggleRelatorioFilters()">
+                            <option value="">Selecione o Tipo...</option>
+                            <option value="rebanho-geral">Rebanho Geral</option>
+                            <option value="lactacao">Rebanho em Lactação</option>
+                            <option value="tarefas-pendentes">Tarefas Pendentes</option>
+                            <option value="tarefas-realizadas">Tarefas Realizadas</option>
+                        </select>
+                    </div>
 
+                    <div id="filtros-animais" style="display: none; border-top: 1px dashed #ccc; padding-top: 15px; margin-top: 15px;">
+                        <h4>Filtros de Animais</h4>
+                        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                            <div class="form-group">
+                                <label for="filtro-animal-raca">Raça (Palavra-chave):</label>
+                                <input type="text" id="filtro-animal-raca" placeholder="Ex: Jersey, Holandesa">
+                            </div>
+                            <div class="form-group">
+                                <label for="filtro-animal-categoria">Categoria:</label>
+                                <select id="filtro-animal-categoria">
+                                    <option value="">Todas</option>
+                                    <option value="Vaca">Vaca</option>
+                                    <option value="Novilha">Novilha</option>
+                                    <option value="Bezerro(a)">Bezerro(a)</option>
+                                    <option value="Boi">Boi</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                            <div class="form-group">
+                                <label for="filtro-animal-idade-min">Idade Mínima (meses):</label>
+                                <input type="number" id="filtro-animal-idade-min" min="0" placeholder="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="filtro-animal-idade-max">Idade Máxima (meses):</label>
+                                <input type="number" id="filtro-animal-idade-max" min="0" placeholder="36">
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- Container para o Alerta Personalizado (Será usado para o prepend) -->
-        <!-- O container será o body, mas para evitar erro de referência nula, a lógica foi corrigida no JS. -->
+                    <div id="filtros-lactacao" style="display: none; padding-top: 10px; margin-top: 10px; border-top: 1px dashed #eee;">
+                        <h4 style="color:var(--info-color);">Filtros Específicos de Lactação</h4>
+                         <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                            <div class="form-group">
+                                <label for="filtro-lactacao-dias-min">Dias em Leite (Mín):</label>
+                                <input type="number" id="filtro-lactacao-dias-min" min="0" placeholder="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="filtro-lactacao-dias-max">Dias em Leite (Máx):</label>
+                                <input type="number" id="filtro-lactacao-dias-max" min="0" placeholder="305">
+                            </div>
+                        </div>
+                         <div class="form-group">
+                            <label for="filtro-lactacao-numero">Número de Lactação:</label>
+                            <input type="number" id="filtro-lactacao-numero" min="1" placeholder="Ex: 1, 2, 3">
+                        </div>
+                    </div>
 
-    </div> <!-- Fim Container -->
+                    <div id="filtros-tarefas" style="display: none; border-top: 1px dashed #ccc; padding-top: 15px; margin-top: 15px;">
+                        <h4>Filtros de Tarefas</h4>
+                        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                             <div class="form-group">
+                                <label for="filtro-tarefa-data-inicio">Data Início (Prev./Realiz.):</label>
+                                <input type="date" id="filtro-tarefa-data-inicio">
+                            </div>
+                            <div class="form-group">
+                                <label for="filtro-tarefa-data-fim">Data Fim (Prev./Realiz.):</label>
+                                <input type="date" id="filtro-tarefa-data-fim">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="filtro-tarefa-tipo">Tipo de Tarefa/Evento:</label>
+                            <select id="filtro-tarefa-tipo">
+                                <option value="">Todos os Tipos</option>
+                                <option value="vacina">Vacinação</option>
+                                <option value="vermifugo">Vermifugação</option>
+                                <option value="cio">Previsão de Cio</option>
+                                <option value="parto">Previsão de Parto</option>
+                                <option value="cobertura">Cobertura/Inseminação</option>
+                                <option value="diagnostico">Diagnóstico de Gestação</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                    </div>
 
-    <script>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;"><i class="ph ph-file-pdf"></i> Gerar Relatório</button>
+                </form>
+            </div>
+        </div>
+
+        </div> <script>
         // Configurações globais e funções utilitárias
         const APP_VERSION = "v8.0";
         const STORAGE_KEY = `rebanho-data-${APP_VERSION}`;
@@ -1115,6 +1204,7 @@
             lactacoes: [],
             nextAnimalId: 1
         };
+
         let producaoDiariaChart;
         let distribuicaoRebanhoChart;
         let animalProducaoChart;
@@ -1122,7 +1212,7 @@
         // Variáveis de Câmera
         let videoStream = null;
 
-        // --- Mapeamento DOM ---
+        // --- Mapeamento DOM (Atualizado com novos elementos de Relatório) ---
         const DOM = {
             // Navegação
             navLinks: document.querySelectorAll('.nav-link'),
@@ -1147,6 +1237,9 @@
 
             // Modal Animal Form
             modalAnimalForm: document.getElementById('modal-animal-form'),
+            parentPaiSelect: document.getElementById('parent-pai-select'),
+            parentMaeSelect: document.getElementById('parent-mae-select'),
+            animalSexoSelect: document.getElementById('animal-sexo-select'),
             animalForm: document.getElementById('animal-form'),
             animalIdInput: document.getElementById('animal-id'),
             animalNomeInput: document.getElementById('animal-nome'),
@@ -1162,7 +1255,7 @@
             animalDataPrevisaoParto: document.getElementById('animal-data-previsao-parto'),
             animalFotoInput: document.getElementById('animal-foto-input'),
             fotoPreview: document.getElementById('foto-preview'),
-            
+
             // Câmera
             cameraVideo: document.getElementById('camera-video'),
             cameraCanvas: document.getElementById('camera-canvas'),
@@ -1192,7 +1285,7 @@
             viewAnimalDetails: document.getElementById('view-animal-details'),
             btnEditView: document.getElementById('btn-edit-view'),
             btnDeleteView: document.getElementById('btn-delete-view'),
-            
+
             // Tabs de Visualização do Animal
             animalViewTabsContainer: document.getElementById('animal-view-tabs'),
             animalHistoricoTimeline: document.getElementById('animal-historico-timeline'),
@@ -1204,28 +1297,100 @@
             resetDataBtn: document.getElementById('reset-data-btn'),
             btnExportarJson: document.getElementById('btn-exportar-json'),
             btnExportarCsv: document.getElementById('btn-exportar-csv'),
-            btnGerarRelatorioPdf: document.getElementById('btn-gerar-relatorio-pdf'),
+            // Removido btnGerarRelatorioPdf, usando o novo
             idPrefixForm: document.getElementById('id-prefix-form'),
             idPrefixInput: document.getElementById('id-prefix-input'),
             currentIdPrefix: document.getElementById('current-id-prefix'),
             inputImportarDados: document.getElementById('input-importar-dados'),
             btnImportarDados: document.getElementById('btn-importar-dados'),
             btnImportarDadosModal: document.getElementById('btn-importar-dados-modal'),
-            
+
             // Modal Importar CSV
             modalImportarCsv: document.getElementById('modal-importar-csv'),
             btnImportarCsvModal: document.getElementById('btn-importar-csv-modal'),
             inputImportarCsv: document.getElementById('input-importar-csv'),
-            btnImportarCsv: document.getElementById('btn-importar-csv')
+            btnImportarCsv: document.getElementById('btn-importar-csv'),
+            
+            // NOVO: Elementos do Modal de Relatórios PDF
+            btnAbrirModalRelatorio: document.getElementById('btn-abrir-modal-relatorio'), // NOVO
+            modalRelatoriosPdf: document.getElementById('modal-relatorios-pdf'), // NOVO
+            formRelatorioPdf: document.getElementById('form-relatorio-pdf'), // NOVO
+            tipoRelatorioSelect: document.getElementById('tipo-relatorio-select'), // NOVO
+            filtrosAnimais: document.getElementById('filtros-animais'), // NOVO
+            filtroAnimalRaca: document.getElementById('filtro-animal-raca'), // NOVO
+            filtroAnimalCategoria: document.getElementById('filtro-animal-categoria'), // NOVO
+            filtroAnimalIdadeMin: document.getElementById('filtro-animal-idade-min'), // NOVO
+            filtroAnimalIdadeMax: document.getElementById('filtro-animal-idade-max'), // NOVO
+            filtrosLactacao: document.getElementById('filtros-lactacao'), // NOVO
+            filtroLactacaoDiasMin: document.getElementById('filtro-lactacao-dias-min'), // NOVO
+            filtroLactacaoDiasMax: document.getElementById('filtro-lactacao-dias-max'), // NOVO
+            filtroLactacaoNumero: document.getElementById('filtro-lactacao-numero'), // NOVO
+            filtrosTarefas: document.getElementById('filtros-tarefas'), // NOVO
+            filtroTarefaDataInicio: document.getElementById('filtro-tarefa-data-inicio'), // NOVO
+            filtroTarefaDataFim: document.getElementById('filtro-tarefa-data-fim'), // NOVO
+            filtroTarefaTipo: document.getElementById('filtro-tarefa-tipo'), // NOVO
         };
-
 
         // --- Funções de Utilitário ---
 
-        // Função para formatar a idade
+        // Função para formatar a data (NOVO/Atualizado)
+        function formatDate(isoString) {
+            if (!isoString) return 'N/D';
+            try {
+                // Adiciona T00:00:00 para tratar a data como UTC e evitar desvio de fuso horário
+                const date = new Date(isoString + "T00:00:00"); 
+                if (isNaN(date)) return 'N/D';
+                return date.toLocaleDateString('pt-BR');
+            } catch (e) {
+                return 'N/D';
+            }
+        }
+
+        // Função para calcular Idade em Meses (para a filtragem) (NOVO)
+    function calculateAgeInMonths(dateOfBirth) {
+    if (!dateOfBirth) return null;
+    const birth = new Date(dateOfBirth + "T00:00:00"); // Assegura fuso horário
+    const today = new Date();
+    let ageMonths = (today.getFullYear() - birth.getFullYear()) * 12;
+    ageMonths -= birth.getMonth();
+    ageMonths += today.getMonth();
+     //Se o dia atual for menor que o dia de nascimento, subtrai 1 mês
+    if (today.getDate() < birth.getDate()) {
+        ageMonths--;
+    }
+    return ageMonths > 0 ? ageMonths : 0;
+}
+
+       // Atualiza o select de categoria com base na data de nascimento e sexo do form
+       function updateCategoryFromDobSex() {
+           if (!DOM.animalDataNascInput || !DOM.animalSexoSelect || !DOM.animalCategoriaSelect) return;
+           const dob = DOM.animalDataNascInput.value;
+           const sexo = DOM.animalSexoSelect.value;
+           const cat = classifyCategory(dob, sexo);
+           if (cat) {
+               // Preenche automaticamente (mas permite alteração manual)
+               DOM.animalCategoriaSelect.value = cat;
+               // Ajusta visibilidade de campos de vaca/novilha quando aplicável
+               const isVacaOrNovilha = cat === 'Vaca' || cat === 'Novilha';
+               DOM.vacaFields.style.display = isVacaOrNovilha ? 'block' : 'none';
+           }
+       }
+
+        // Função para calcular Dias em Leite (DEL) (NOVO)
+        function calculateDaysInMilk(lastCalvingDate) {
+            if (!lastCalvingDate) return null;
+            const today = new Date();
+            const calving = new Date(lastCalvingDate + "T00:00:00"); // Assegura fuso horário
+            if (calving > today) return 0; // Se a data do parto for futura, considera 0.
+            const diffTime = Math.abs(today.getTime() - calving.getTime());
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            return diffDays;
+        }
+
+        // Função para formatar a idade (existente, mantida para exibir)
         function calculateAge(dateOfBirth) {
             if (!dateOfBirth) return 'N/D';
-            const birth = new Date(dateOfBirth);
+            const birth = new Date(dateOfBirth + "T00:00:00");
             const today = new Date();
             let ageYears = today.getFullYear() - birth.getFullYear();
             let ageMonths = today.getMonth() - birth.getMonth();
@@ -1234,6 +1399,7 @@
                 ageYears--;
                 ageMonths += 12;
             }
+
             if (ageYears < 1) {
                 return `${ageMonths} meses`;
             }
@@ -1247,944 +1413,1388 @@
         }
         
         // Função para calcular próxima data de cio/parto
-        function calculateNextReproDate(lastDate, type) {
+        function calculateNextReproDate(lastDate, type) { 
             if (!lastDate) return 'N/D';
-            const date = new Date(lastDate);
+            const date = new Date(lastDate + "T00:00:00"); 
             let daysToAdd = 0;
-
             if (type === 'parto') {
-                // Previsão de parto (Ex: 285 dias após a última cobertura/inseminação que resultou em prenhez)
-                // Usando a data do último parto para prever o próximo cio, não o parto.
-                // Esta função será usada para prever cio (21 dias) e o parto previsto (a partir da cobertura)
-                return 'N/D'; 
+                // Previsão de parto (Ex: 285 dias após a última cobertura/inseminação)
+                daysToAdd = 285; 
             } else if (type === 'cio') {
-                // Previsão de Cio (Ex: 21 dias após o parto ou último cio/cobertura)
-                daysToAdd = 21;
+                // Previsão de cio (Ex: 21 dias após o último cio/parto)
+                daysToAdd = 21; 
+            } else {
+                return 'N/D';
             }
 
-            if (daysToAdd > 0) {
-                date.setDate(date.getDate() + daysToAdd);
-                return date.toISOString().split('T')[0];
-            }
-            return 'N/D';
+            date.setDate(date.getDate() + daysToAdd);
+            return formatDate(date.toISOString().split('T')[0]);
+        }
+        
+        // Função para obter o nome do animal
+        function getAnimalName(id) {
+            const animal = rebanhoData.animais.find(a => a.id === id);
+            return animal ? animal.nome : 'Animal Desconhecido';
         }
 
-        // --- Funções de Persistência (Local Storage) ---
-        function loadData() {
-            try {
-                const dataString = localStorage.getItem(STORAGE_KEY);
-                if (dataString) {
-                    rebanhoData = JSON.parse(dataString);
-                }
+        // --- Funções do Novo Relatório PDF ---
+
+        // Função para coletar os filtros do modal (NOVO)
+        function collectRelatorioFilters(tipo) {
+            const filtros = {};
+
+            if (tipo === 'rebanho-geral' || tipo === 'lactacao') {
+                // Filtros de Animais
+                if (DOM.filtroAnimalRaca.value) filtros.raca = DOM.filtroAnimalRaca.value.trim();
+                if (DOM.filtroAnimalCategoria.value) filtros.categoria = DOM.filtroAnimalCategoria.value;
+                if (DOM.filtroAnimalIdadeMin.value) filtros.idadeMinMeses = parseInt(DOM.filtroAnimalIdadeMin.value);
+                if (DOM.filtroAnimalIdadeMax.value) filtros.idadeMaxMeses = parseInt(DOM.filtroAnimalIdadeMax.value);
                 
-                // Inicializa o prefixo do ID se não existir
-                if (!localStorage.getItem('idPrefix')) {
-                    localStorage.setItem('idPrefix', 'ID');
+                // Filtros de Lactação (apenas se for 'lactacao')
+                if (tipo === 'lactacao') {
+                    if (DOM.filtroLactacaoDiasMin.value) filtros.diasLactacaoMin = parseInt(DOM.filtroLactacaoDiasMin.value);
+                    if (DOM.filtroLactacaoDiasMax.value) filtros.diasLactacaoMax = parseInt(DOM.filtroLactacaoDiasMax.value);
+                    if (DOM.filtroLactacaoNumero.value) filtros.numeroLactacao = parseInt(DOM.filtroLactacaoNumero.value);
                 }
-                if (DOM.currentIdPrefix) {
-                    DOM.currentIdPrefix.textContent = localStorage.getItem('idPrefix');
-                }
-                if (DOM.idPrefixInput) {
-                    DOM.idPrefixInput.value = localStorage.getItem('idPrefix');
-                }
-                
-            } catch (e) {
-                console.error("Erro ao carregar dados do LocalStorage:", e);
-                // Limpa dados corrompidos se necessário
-                // localStorage.removeItem(STORAGE_KEY);
+            } else if (tipo.startsWith('tarefas')) {
+                // Filtros de Tarefas
+                filtros.status = tipo === 'tarefas-pendentes' ? 'Pendente' : 'Realizada';
+                if (DOM.filtroTarefaDataInicio.value) filtros.dataInicio = DOM.filtroTarefaDataInicio.value;
+                if (DOM.filtroTarefaDataFim.value) filtros.dataFim = DOM.filtroTarefaDataFim.value;
+                if (DOM.filtroTarefaTipo.value) filtros.tipo = DOM.filtroTarefaTipo.value;
             }
+
+            return filtros;
         }
 
-        function saveData() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(rebanhoData));
-            } catch (e) {
-                console.error("Erro ao salvar dados no LocalStorage:", e);
-                showCustomAlert('Erro ao salvar dados. Seu navegador pode estar sem espaço.');
-            }
+        // Função para mostrar/esconder filtros (NOVO)
+        function toggleRelatorioFilters() {
+            const tipo = DOM.tipoRelatorioSelect.value;
             
-            // Re-renderiza e atualiza todas as views após salvar
-            updateDashboard();
-            renderAnimalList();
-            renderLeiteList();
-            renderProximasTarefas();
-            populateSelects();
+            // Esconder todos por padrão
+            DOM.filtrosAnimais.style.display = 'none';
+            DOM.filtrosLactacao.style.display = 'none';
+            DOM.filtrosTarefas.style.display = 'none';
+
+            if (tipo === 'rebanho-geral') {
+                DOM.filtrosAnimais.style.display = 'grid';
+            } else if (tipo === 'lactacao') {
+                DOM.filtrosAnimais.style.display = 'grid';
+                DOM.filtrosLactacao.style.display = 'block';
+            } else if (tipo.startsWith('tarefas')) {
+                DOM.filtrosTarefas.style.display = 'block';
+            }
         }
-        
-        // --- Funções de Navegação e UI ---
-        
-        function showSection(sectionId) {
-            DOM.pageSections.forEach(section => {
-                section.style.display = section.id === sectionId ? 'block' : 'none';
+
+        // Substitui a função generateReportPdf existente (Lógica principal de filtros)
+        async function generateReportPdf(tipoRelatorio, filtros = {}) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const pageHeight = doc.internal.pageSize.height;
+            let y = 10;
+            const margin = 15;
+
+            if (!tipoRelatorio) {
+                showCustomAlert('Erro', 'Tipo de relatório inválido.', 'warning');
+                return;
+            }
+
+            // Cabeçalho Padrão
+            doc.setFontSize(18);
+            doc.setTextColor(40, 167, 69); // Cor primária
+            doc.text('Relatório Gerencial de Rebanho Leiteiro', margin, y);
+            y += 8;
+            
+            doc.setFontSize(10);
+            doc.setTextColor(108, 117, 125); // Cor cinza
+            doc.text(`Data de Geração: ${formatDate(new Date().toISOString().split('T')[0])}`, margin, y);
+            y += 5;
+            
+            doc.setDrawColor(40, 167, 69);
+            doc.line(margin, y, 210 - margin, y); // Linha separadora
+            y += 5;
+
+            doc.setTextColor(52, 58, 64); // Cor texto principal
+
+            let titulo, colunas, dados, subfiltros = 'Nenhum filtro aplicado.';
+            let totalRegistros = 0;
+
+            // --- Lógica de Filtragem ---
+            
+            if (tipoRelatorio === 'rebanho-geral') {
+                titulo = 'Rebanho Geral';
+                colunas = ['ID', 'Nome', 'Raça', 'Categoria', 'Idade', 'Status Reprodutivo'];
+                
+                const animaisFiltrados = rebanhoData.animais.filter(animal => {
+                    const idadeMeses = calculateAgeInMonths(animal.dataNasc);
+                    const racaMatch = filtros.raca ? animal.raca.toLowerCase().includes(filtros.raca.toLowerCase()) : true;
+                    const categoriaMatch = filtros.categoria ? animal.categoria === filtros.categoria : true;
+                    const idadeMinMatch = filtros.idadeMinMeses !== undefined ? idadeMeses >= filtros.idadeMinMeses : true;
+                    const idadeMaxMatch = filtros.idadeMaxMeses !== undefined ? idadeMeses <= filtros.idadeMaxMeses : true;
+                    
+                    return racaMatch && categoriaMatch && idadeMinMatch && idadeMaxMatch;
+                });
+
+                dados = animaisFiltrados.map(animal => [
+                    formatAnimalId(animal.id),
+                    animal.nome,
+                    animal.raca,
+                    animal.categoria,
+                    calculateAge(animal.dataNasc),
+                    animal.statusReprodutivo || 'N/D'
+                ]);
+
+                // Resumo dos Filtros Aplicados
+                const idadeFiltro = (filtros.idadeMinMeses !== undefined || filtros.idadeMaxMeses !== undefined) ? 
+                    `${filtros.idadeMinMeses !== undefined ? filtros.idadeMinMeses + 'm' : '0m'} - ${filtros.idadeMaxMeses !== undefined ? filtros.idadeMaxMeses + 'm' : 'Máx'}` : 'Todas';
+                
+                subfiltros = `Filtros: Cat.: ${filtros.categoria || 'Todas'}, Raça: ${filtros.raca || 'Todas'}, Idade: ${idadeFiltro}`;
+
+            } else if (tipoRelatorio === 'lactacao') {
+                titulo = 'Rebanho em Lactação';
+                colunas = ['ID', 'Nome', 'Raça', 'Nº Lactação', 'Último Parto', 'DEL'];
+
+                const animaisFiltrados = rebanhoData.animais.filter(animal => {
+                    if (animal.statusReprodutivo !== 'Em Lactação' || !animal.dataUltimoParto) return false;
+
+                    const racaMatch = filtros.raca ? animal.raca.toLowerCase().includes(filtros.raca.toLowerCase()) : true;
+                    const categoriaMatch = filtros.categoria ? animal.categoria === filtros.categoria : true;
+                    
+                    const diasLactacao = calculateDaysInMilk(animal.dataUltimoParto);
+                    const idadeMeses = calculateAgeInMonths(animal.dataNasc);
+
+                    const idadeMinMatch = filtros.idadeMinMeses !== undefined ? idadeMeses >= filtros.idadeMinMeses : true;
+                    const idadeMaxMatch = filtros.idadeMaxMeses !== undefined ? idadeMeses <= filtros.idadeMaxMeses : true;
+                    
+                    const diasMinMatch = filtros.diasLactacaoMin !== undefined ? diasLactacao >= filtros.diasLactacaoMin : true;
+                    const diasMaxMatch = filtros.diasLactacaoMax !== undefined ? diasLactacao <= filtros.diasLactacaoMax : true;
+                    // Assumindo que lactacoes é um array no animal, o número de lactação é o seu length
+                    const numLactacaoAtual = animal.lactacoes ? animal.lactacoes.length : 0; 
+                    const numeroLactacaoMatch = filtros.numeroLactacao !== undefined ? numLactacaoAtual === filtros.numeroLactacao : true; 
+                    
+                    return racaMatch && categoriaMatch && idadeMinMatch && idadeMaxMatch && diasMinMatch && diasMaxMatch && numeroLactacaoMatch;
+                });
+                
+                dados = animaisFiltrados.map(animal => {
+                    const diasLactacao = calculateDaysInMilk(animal.dataUltimoParto) || 'N/D';
+                    const numLactacao = animal.lactacoes ? animal.lactacoes.length : 'N/D'; 
+                    return [
+                        formatAnimalId(animal.id),
+                        animal.nome,
+                        animal.raca,
+                        numLactacao,
+                        formatDate(animal.dataUltimoParto),
+                        `${diasLactacao} dias`
+                    ];
+                });
+
+                // Resumo dos Filtros Aplicados
+                const diasFiltro = (filtros.diasLactacaoMin !== undefined || filtros.diasLactacaoMax !== undefined) ? 
+                    `${filtros.diasLactacaoMin !== undefined ? filtros.diasLactacaoMin : '0'} - ${filtros.diasLactacaoMax !== undefined ? filtros.diasLactacaoMax : 'Máx'} dias` : 'Todos';
+
+                subfiltros = `Filtros: Raça: ${filtros.raca || 'Todas'}, DEL: ${diasFiltro}, Nº Lactação: ${filtros.numeroLactacao || 'Todos'}`;
+
+            } else if (tipoRelatorio.startsWith('tarefas')) {
+                const isPendente = tipoRelatorio === 'tarefas-pendentes';
+                titulo = isPendente ? 'Tarefas Pendentes' : 'Tarefas Realizadas';
+                colunas = ['Data (Prev./Real.)', 'Animal', 'Tipo', 'Detalhes'];
+                
+                // Filtro de tarefas: Assumimos que a tarefa tem um campo 'done: boolean'
+                const tarefasFiltradas = rebanhoData.tarefas.filter(tarefa => {
+                    // Filtro por Status
+                    const statusMatch = isPendente ? !tarefa.done : tarefa.done;
+                    if (!statusMatch) return false;
+
+                    // Filtro por Tipo
+                    const tipoMatch = filtros.tipo ? tarefa.tipo === filtros.tipo : true;
+
+                    // Filtro por Data: usa data limite (tarefa.data) para Pendentes, e dataConclusao (se existir) para Realizadas
+                    const dataReferencia = isPendente ? tarefa.data : (tarefa.dataConclusao || tarefa.data);
+                    const dataInicioMatch = filtros.dataInicio ? dataReferencia >= filtros.dataInicio : true;
+                    const dataFimMatch = filtros.dataFim ? dataReferencia <= filtros.dataFim : true;
+                    
+                    return tipoMatch && dataInicioMatch && dataFimMatch;
+                });
+
+                // Montar dados para a tabela
+                dados = tarefasFiltradas.map(tarefa => {
+                    const animal = rebanhoData.animais.find(a => a.id === tarefa.animalId) || { nome: 'Animal Removido' };
+                    const dataFinal = isPendente ? formatDate(tarefa.data) : (tarefa.dataConclusao ? formatDate(tarefa.dataConclusao) : formatDate(tarefa.data));
+                    return [
+                        dataFinal,
+                        animal.nome,
+                        tarefa.tipo.charAt(0).toUpperCase() + tarefa.tipo.slice(1), 
+                        tarefa.descricao
+                    ];
+                });
+
+                // Resumo dos Filtros Aplicados
+                const dataFiltro = filtros.dataInicio || filtros.dataFim ?
+                    `${formatDate(filtros.dataInicio) || 'Início'} a ${formatDate(filtros.dataFim) || 'Fim'}` : 'Todas';
+
+                subfiltros = `Filtros: Tipo: ${filtros.tipo || 'Todos'}, Período: ${dataFiltro}`;
+            }
+
+            totalRegistros = dados.length;
+            
+            // Alerta se não houver registros
+            if (totalRegistros === 0) {
+                showCustomAlert('Atenção', `Nenhum registro encontrado para o relatório de ${titulo} com os filtros aplicados.`, 'warning');
+                return;
+            }
+
+            doc.setFontSize(14);
+            doc.text(`${titulo} (${totalRegistros} registros)`, margin, y);
+            y += 7;
+            
+            // Adicionar linha de subfiltros
+            doc.setFontSize(10);
+            doc.text(subfiltros, margin, y);
+            y += 5;
+
+            // Configuração e Geração da Tabela
+            doc.autoTable({
+                startY: y,
+                head: [colunas],
+                body: dados,
+                theme: 'striped',
+                headStyles: { 
+                    fillColor: [0, 123, 255], // Azul secundário
+                    textColor: 255, 
+                    fontStyle: 'bold' 
+                }, 
+                styles: { 
+                    fontSize: 9, 
+                    cellPadding: 3 
+                },
+                didDrawPage: function(data) {
+                    // Rodapé com número de página
+                    doc.setFontSize(10);
+                    doc.text('Página ' + doc.internal.getNumberOfPages(), 
+                        data.settings.margin.left, 
+                        pageHeight - 10
+                    );
+                }
             });
 
+            // Salvar o PDF
+            doc.save(`Relatorio_${tipoRelatorio}_${new Date().toISOString().split('T')[0]}.pdf`);
+        }
+
+        // ... (Restante do código JavaScript deve ser colado aqui, substituindo o original)
+
+        // --- Funções Auxiliares de UI/Lógica de Negócios (Existentes) ---
+
+        // Função para mostrar/esconder seções da página
+        function showSection(sectionId) {
+            DOM.pageSections.forEach(section => {
+                section.style.display = 'none';
+                if (section.id === sectionId) {
+                    section.style.display = 'block';
+                }
+            });
             DOM.navLinks.forEach(link => {
                 link.classList.remove('active');
-                if (link.dataset.section === sectionId) {
+                if (link.getAttribute('data-section') === sectionId) {
                     link.classList.add('active');
                 }
             });
-            
-            // Atualiza o hash da URL
-            window.location.hash = sectionId;
-            
-            // Chama a função de atualização específica da seção
-            if (sectionId === 'dashboard') {
-                updateDashboard();
-            } else if (sectionId === 'animais') {
+            updateDashboard(); // Garante que o dashboard é atualizado ao retornar
+            if (sectionId === 'animais') {
                 renderAnimalList();
-            } else if (sectionId === 'producao') {
-                renderLeiteList();
-            } else if (sectionId === 'saude') {
-                renderTarefaList();
             }
         }
 
-        // --- Funções de CRUD (Animal) ---
+        // Função para persistir dados no LocalStorage
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(rebanhoData));
+            } catch (error) {
+                console.error("Erro ao salvar dados no LocalStorage:", error);
+                showCustomAlert('Erro de Dados', 'Não foi possível salvar os dados. Verifique o espaço de armazenamento do navegador.', 'danger');
+            }
+        }
 
+        // Função para carregar dados do LocalStorage
+        function loadData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (data) {
+                try {
+                    rebanhoData = JSON.parse(data);
+                    // Garante que os arrays estejam inicializados se o load falhar
+                    rebanhoData.animais = rebanhoData.animais || [];
+                    rebanhoData.producaoLeite = rebanhoData.producaoLeite || [];
+                    rebanhoData.tarefas = rebanhoData.tarefas || [];
+                    rebanhoData.lactacoes = rebanhoData.lactacoes || [];
+                    rebanhoData.nextAnimalId = rebanhoData.nextAnimalId || 1;
+                } catch (error) {
+                    console.error("Erro ao parsear dados do LocalStorage:", error);
+                    showCustomAlert('Erro de Leitura', 'Os dados salvos estão corrompidos. Carregando dados vazios.', 'danger');
+                }
+            }
+            // Atualiza o prefixo de ID na interface
+            DOM.currentIdPrefix.textContent = localStorage.getItem('idPrefix') || 'ID';
+        }
+
+        // Função de Alerta Personalizado (Melhorada para funcionar globalmente)
+        let currentAlert = null;
+        function showCustomAlert(title, message, type = 'info') {
+            if (currentAlert) return; 
+
+            const overlay = document.createElement('div');
+            overlay.className = 'custom-alert-overlay show';
+            overlay.style.display = 'flex';
+            currentAlert = overlay;
+
+            const iconMap = {
+                'success': 'ph-check-circle',
+                'danger': 'ph-x-circle',
+                'warning': 'ph-warning-octagon',
+                'info': 'ph-info'
+            };
+
+            overlay.innerHTML = `
+                <div class="custom-alert-box ${type}">
+                    <i class="ph ${iconMap[type] || 'ph-info'} custom-alert-icon" style="color:var(--${type}-color);"></i>
+                    <h3>${title}</h3>
+                    <p class="custom-alert-message">${message}</p>
+                    <div class="custom-alert-actions">
+                        <button class="btn btn-primary" onclick="closeCustomAlert()"><i class="ph ph-check"></i> OK</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        function closeCustomAlert() {
+            if (currentAlert) {
+                currentAlert.classList.remove('show');
+                currentAlert.querySelector('.custom-alert-box').style.transform = 'translateY(-20px)';
+                setTimeout(() => {
+                    if (currentAlert && currentAlert.parentNode) {
+                        currentAlert.parentNode.removeChild(currentAlert);
+                    }
+                    currentAlert = null;
+                }, 300);
+            }
+        }
+        
+        // Função de Confirmação Personalizada
+        function showCustomConfirm(title, message, onConfirm, onCancel = () => {}) {
+            if (currentAlert) return; 
+
+            const overlay = document.createElement('div');
+            overlay.className = 'custom-alert-overlay show';
+            overlay.style.display = 'flex';
+            currentAlert = overlay;
+
+            overlay.innerHTML = `
+                <div class="custom-alert-box confirm">
+                    <i class="ph ph-warning-octagon custom-alert-icon" style="color:var(--warning-color);"></i>
+                    <h3>${title}</h3>
+                    <p class="custom-alert-message">${message}</p>
+                    <div class="custom-alert-actions">
+                        <button class="btn btn-danger" id="confirm-yes"><i class="ph ph-check"></i> Confirmar</button>
+                        <button class="btn btn-secondary" id="confirm-no"><i class="ph ph-x"></i> Cancelar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            document.getElementById('confirm-yes').onclick = () => {
+                closeCustomAlert();
+                onConfirm();
+            };
+            document.getElementById('confirm-no').onclick = () => {
+                closeCustomAlert();
+                onCancel();
+            };
+        }
+
+        // --- Funções de Manipulação de Dados (CRUD) ---
+
+        // Função para criar/editar animal
+        function saveAnimal(event) {
+            event.preventDefault();
+
+            const isEditing = DOM.animalIdInput.value !== '';
+            const animalId = isEditing ? parseInt(DOM.animalIdInput.value) : rebanhoData.nextAnimalId;
+
+            const newAnimal = {
+                id: animalId,
+                nome: DOM.animalNomeInput.value,
+                raca: DOM.animalRacaInput.value,
+                sexo: DOM.animalSexoSelect.value || 'Indefinido',
+                categoria: DOM.animalCategoriaSelect.value,
+                peso: parseFloat(DOM.animalPesoInput.value),
+                dataNasc: DOM.animalDataNascInput.value,
+                dataAquisicao: DOM.animalDataAquisicaoInput.value,
+                statusReprodutivo: DOM.animalStatusReprodutivo.value,
+                dataUltimoParto: DOM.animalDataUltimoParto.value || null,
+                dataSecagem: DOM.animalDataSecagem.value || null,
+                dataPrevisaoParto: DOM.animalDataPrevisaoParto.value || null,
+                fotoBase64: DOM.fotoPreview.src === PLACEHOLDER_FOTO ? null : DOM.fotoPreview.src,
+                parentPaiId: DOM.parentPaiSelect.value ? parseInt(DOM.parentPaiSelect.value) : null,
+                parentMaeId: DOM.parentMaeSelect.value ? parseInt(DOM.parentMaeSelect.value) : null,
+                lactacoes: rebanhoData.animais.find(a => a.id === animalId)?.lactacoes || [], // Mantém lactações existentes
+            };
+
+            if (isEditing) {
+                const index = rebanhoData.animais.findIndex(a => a.id === animalId);
+                if (index > -1) {
+                    // Preserva os dados que não estão no formulário de edição (ex: foto se não foi alterada)
+                    newAnimal.fotoBase64 = newAnimal.fotoBase64 || rebanhoData.animais[index].fotoBase64;
+
+                    if (!DOM.animalSexoSelect.value) newAnimal.sexo = rebanhoData.animais[index].sexo || 'Indefinido';
+                    if (!DOM.parentPaiSelect.value) newAnimal.parentPaiId = rebanhoData.animais[index].parentPaiId || null;
+                    if (!DOM.parentMaeSelect.value) newAnimal.parentMaeId = rebanhoData.animais[index].parentMaeId || null;
+                    rebanhoData.animais[index] = newAnimal;
+                }
+                showCustomAlert('Sucesso', `Animal ${formatAnimalId(animalId)} atualizado com sucesso!`, 'success');
+            } else {
+                rebanhoData.animais.push(newAnimal);
+                rebanhoData.nextAnimalId++;
+                showCustomAlert('Sucesso', `Novo animal ${formatAnimalId(animalId)} cadastrado!`, 'success');
+            }
+
+            DOM.modalAnimalForm.style.display = 'none';
+            saveData();
+            renderAnimalList();
+            updateAllSelectors();
+            updateDashboard();
+        }
+
+        // Função para abrir o formulário (Edição ou Novo)
         function openAnimalForm(animalId = null) {
-            DOM.modalAnimalForm.style.display = 'flex';
             DOM.animalForm.reset();
             DOM.animalIdInput.value = '';
-            DOM.vacaFields.style.display = 'none';
+            DOM.fotoPreview.src = PLACEHOLDER_FOTO;
             DOM.fotoPreview.style.display = 'none';
-            DOM.fotoPreview.src = '';
+            DOM.vacaFields.style.display = 'none';
             
-            // Limpa camera se estiver ativa
-            stopCamera();
-
+            // Listener temporário para mostrar/esconder campos de Vaca/Novilha
+            DOM.animalCategoriaSelect.onchange = () => {
+                const isVacaOrNovilha = DOM.animalCategoriaSelect.value === 'Vaca' || DOM.animalCategoriaSelect.value === 'Novilha';
+                DOM.vacaFields.style.display = isVacaOrNovilha ? 'block' : 'none';
+                if (!isVacaOrNovilha) {
+                    // Limpar campos se a categoria mudar
+                    DOM.animalStatusReprodutivo.value = 'Vazia';
+                    DOM.animalDataUltimoParto.value = '';
+                    DOM.animalDataSecagem.value = '';
+                    DOM.animalDataPrevisaoParto.value = '';
+                }
+            };
+            
             if (animalId) {
                 const animal = rebanhoData.animais.find(a => a.id === animalId);
                 if (animal) {
+                    populateParentSelects(animal.id);
+
                     DOM.animalIdInput.value = animal.id;
                     DOM.animalNomeInput.value = animal.nome;
                     DOM.animalRacaInput.value = animal.raca;
+                     DOM.animalSexoSelect.value = animal.sexo || '';
                     DOM.animalCategoriaSelect.value = animal.categoria;
                     DOM.animalPesoInput.value = animal.peso;
                     DOM.animalDataNascInput.value = animal.dataNasc;
-                    DOM.animalDataAquisicaoInput.value = animal.dataAquisicao || '';
-                    
-                    // Campos de Vaca/Novilha
-                    if (['Vaca', 'Novilha'].includes(animal.categoria)) {
-                        DOM.vacaFields.style.display = 'block';
-                        DOM.animalStatusReprodutivo.value = animal.statusReprodutivo;
+                    DOM.animalDataAquisicaoInput.value = animal.dataAquisicao;
+                    DOM.parentPaiSelect.value = animal.parentPaiId || '';
+                    DOM.parentMaeSelect.value = animal.parentMaeId || '';
+
+                    const isVacaOrNovilha = animal.categoria === 'Vaca' || animal.categoria === 'Novilha';
+                    DOM.vacaFields.style.display = isVacaOrNovilha ? 'block' : 'none';
+
+                    if (isVacaOrNovilha) {
+                        DOM.animalStatusReprodutivo.value = animal.statusReprodutivo || 'Vazia';
                         DOM.animalDataUltimoParto.value = animal.dataUltimoParto || '';
                         DOM.animalDataSecagem.value = animal.dataSecagem || '';
                         DOM.animalDataPrevisaoParto.value = animal.dataPrevisaoParto || '';
                     }
                     
-                    // Foto
                     if (animal.fotoBase64) {
                         DOM.fotoPreview.src = animal.fotoBase64;
                         DOM.fotoPreview.style.display = 'block';
+                    } else {
+                         DOM.fotoPreview.src = PLACEHOLDER_FOTO;
+                         DOM.fotoPreview.style.display = 'none';
                     }
+
+                    document.querySelector('#modal-animal-form h3').textContent = `Editar Animal ${formatAnimalId(animal.id)}`;
                 }
-            }
-        }
-
-        function saveAnimal(event) {
-            event.preventDefault();
-
-            const animalId = DOM.animalIdInput.value ? parseInt(DOM.animalIdInput.value) : null;
-            const categoria = DOM.animalCategoriaSelect.value;
-            
-            let animal = {
-                id: animalId, // Será atribuído ou mantido
-                nome: DOM.animalNomeInput.value,
-                raca: DOM.animalRacaInput.value,
-                categoria: categoria,
-                peso: parseFloat(DOM.animalPesoInput.value),
-                dataNasc: DOM.animalDataNascInput.value,
-                dataAquisicao: DOM.animalDataAquisicaoInput.value,
-                fotoBase64: DOM.fotoPreview.src, // Salva o base64 da preview
-                // Campos de reprodução
-                statusReprodutivo: ['Vaca', 'Novilha'].includes(categoria) ? DOM.animalStatusReprodutivo.value : 'N/A',
-                dataUltimoParto: (['Vaca', 'Novilha'].includes(categoria) ? DOM.animalDataUltimoParto.value : '') || '',
-                dataSecagem: (['Vaca', 'Novilha'].includes(categoria) ? DOM.animalDataSecagem.value : '') || '',
-                dataPrevisaoParto: (['Vaca', 'Novilha'].includes(categoria) ? DOM.animalDataPrevisaoParto.value : '') || '',
-            };
-            
-            // Lógica de Novo Animal
-            if (!animalId) {
-                animal.id = rebanhoData.nextAnimalId++;
-                rebanhoData.animais.push(animal);
-                showCustomAlert(`Animal ${formatAnimalId(animal.id)} adicionado com sucesso!`);
             } else {
-                // Lógica de Edição
-                const index = rebanhoData.animais.findIndex(a => a.id === animalId);
-                if (index !== -1) {
-                    rebanhoData.animais[index] = animal;
-                    showCustomAlert(`Animal ${formatAnimalId(animal.id)} atualizado com sucesso!`);
-                }
+                document.querySelector('#modal-animal-form h3').textContent = `Novo Animal (Próximo ID: ${formatAnimalId(rebanhoData.nextAnimalId)})`;
+                DOM.animalCategoriaSelect.value = ''; // Reset para a opção "Selecione..."
+                DOM.animalStatusReprodutivo.value = 'Vazia';
+                populateParentSelects();
+                DOM.animalSexoSelect.value = '';
+                DOM.parentPaiSelect.value = '';
+                DOM.parentMaeSelect.value = '';
             }
 
-            saveData();
-            DOM.modalAnimalForm.style.display = 'none';
+            DOM.modalAnimalForm.style.display = 'flex';
+            DOM.modalAnimalView.style.display = 'none'; // Fechar modal de visualização se estiver aberto
         }
-        
+
+        // Função para exclusão de animal
         function deleteAnimal(animalId) {
-            showCustomConfirm('Tem certeza que deseja EXCLUIR este animal e todos os seus registros de leite/tarefas?', () => {
+            showCustomConfirm('Confirmar Exclusão', `Tem certeza que deseja excluir o animal ${formatAnimalId(animalId)} e todos os seus registros de leite/tarefas? Esta ação é irreversível.`, () => {
                 rebanhoData.animais = rebanhoData.animais.filter(a => a.id !== animalId);
                 rebanhoData.producaoLeite = rebanhoData.producaoLeite.filter(p => p.animalId !== animalId);
                 rebanhoData.tarefas = rebanhoData.tarefas.filter(t => t.animalId !== animalId);
                 rebanhoData.lactacoes = rebanhoData.lactacoes.filter(l => l.animalId !== animalId);
+
                 saveData();
                 DOM.modalAnimalView.style.display = 'none';
-                showCustomAlert(`Animal ${formatAnimalId(animalId)} e seus registros foram excluídos.`);
+                renderAnimalList();
+                updateDashboard();
+                updateAllSelectors();
+                showCustomAlert('Sucesso', `Animal ${formatAnimalId(animalId)} excluído.`, 'success');
             });
         }
-        
-        function viewAnimal(animalId) {
-            const animal = rebanhoData.animais.find(a => a.id === animalId);
-            if (!animal) return;
 
-            DOM.viewAnimalTitle.textContent = `${formatAnimalId(animal.id)} - ${animal.nome}`;
-            DOM.viewAnimalFoto.src = animal.fotoBase64 || PLACEHOLDER_FOTO;
-            
-            // Botões de Ação
-            DOM.btnEditView.onclick = () => { DOM.modalAnimalView.style.display = 'none'; openAnimalForm(animalId); };
-            DOM.btnDeleteView.onclick = () => deleteAnimal(animalId);
+        // --- Funções de Leite/Produção ---
 
-            // Detalhes
-            DOM.viewAnimalDetails.innerHTML = `
-                <dt>Categoria</dt><dd>${animal.categoria}</dd>
-                <dt>Raça</dt><dd>${animal.raca}</dd>
-                <dt>Idade</dt><dd>${calculateAge(animal.dataNasc)}</dd>
-                <dt>Data Nasc.</dt><dd>${new Date(animal.dataNasc).toLocaleDateString()}</dd>
-                <dt>Peso (Kg)</dt><dd>${animal.peso}</dd>
-                ${['Vaca', 'Novilha'].includes(animal.categoria) ? `
-                    <dt>Status Reprodutivo</dt><dd>${animal.statusReprodutivo}</dd>
-                    <dt>Último Parto</dt><dd>${animal.dataUltimoParto ? new Date(animal.dataUltimoParto).toLocaleDateString() : 'N/D'}</dd>
-                    <dt>Data Secagem</dt><dd>${animal.dataSecagem ? new Date(animal.dataSecagem).toLocaleDateString() : 'N/D'}</dd>
-                    <dt>Previsão Parto</dt><dd>${animal.dataPrevisaoParto ? new Date(animal.dataPrevisaoParto).toLocaleDateString() : 'N/D'}</dd>
-                ` : ''}
-            `;
-            
-            // Renderiza Tabs
-            renderAnimalHistorico(animalId);
-            renderAnimalProducao(animalId);
-            renderAnimalLactacoes(animalId);
-            
-            // Inicializa gráfico se necessário
-            if (!animalProducaoChart) {
-                initAnimalProducaoChart();
-            } else {
-                updateAnimalProducaoChart(animalId);
-            }
-            
-            // Exibe a primeira aba e o modal
-            document.querySelectorAll('#animal-view-tabs button').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('#modal-animal-view .animal-view-tab-content').forEach(content => content.style.display = 'none');
-            
-            const defaultTabBtn = document.querySelector('#animal-view-tabs button[data-tab="historico"]');
-            const defaultTabContent = document.getElementById('historico');
-            
-            if (defaultTabBtn) defaultTabBtn.classList.add('active');
-            if (defaultTabContent) defaultTabContent.style.display = 'block';
-
-            DOM.modalAnimalView.style.display = 'flex';
-        }
-        
-        // --- Funções de Renderização (Listas) ---
-
-        function renderAnimalList() {
-            if (!DOM.animalListTbody) return;
-
-            const filtroCategoria = DOM.filtroCategoriaSelect.value;
-            const buscaTermo = DOM.buscaAnimalInput.value.toLowerCase();
-            
-            const filteredAnimais = rebanhoData.animais
-                .filter(a => filtroCategoria === '' || a.categoria === filtroCategoria)
-                .filter(a => 
-                    a.nome.toLowerCase().includes(buscaTermo) || 
-                    formatAnimalId(a.id).toLowerCase().includes(buscaTermo)
-                )
-                .sort((a, b) => a.id - b.id);
-
-            DOM.animalListTbody.innerHTML = filteredAnimais.map(animal => {
-                const idade = calculateAge(animal.dataNasc);
-                const status = animal.statusReprodutivo || animal.categoria;
-                return `
-                    <tr>
-                        <td>${formatAnimalId(animal.id)}</td>
-                        <td>${animal.nome}</td>
-                        <td>${animal.categoria}</td>
-                        <td>${idade}</td>
-                        <td>${status}</td>
-                        <td style="white-space: nowrap;">
-                            <button class="btn btn-info btn-sm" onclick="viewAnimal(${animal.id})"><i class="ph ph-eye"></i> Ver</button>
-                            <button class="btn btn-warning btn-sm" onclick="editAnimal(${animal.id})"><i class="ph ph-pencil"></i> Editar</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteAnimal(${animal.id})"><i class="ph ph-trash"></i> Excluir</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-        
-        function renderLeiteList() {
-             if (!DOM.leiteListTbody) return;
-
-             const leiteList = rebanhoData.producaoLeite
-                .sort((a, b) => new Date(b.data) - new Date(a.data)) // Mais recente primeiro
-                .slice(0, 15); // Apenas os 15 mais recentes
-
-            DOM.leiteListTbody.innerHTML = leiteList.map(registro => {
-                const animal = rebanhoData.animais.find(a => a.id === registro.animalId);
-                const animalNome = animal ? `${formatAnimalId(animal.id)} - ${animal.nome}` : 'Animal Excluído';
-                return `
-                    <tr>
-                        <td>${new Date(registro.data).toLocaleDateString()}</td>
-                        <td><a href="#" onclick="event.preventDefault(); viewAnimal(${registro.animalId})">${animalNome}</a></td>
-                        <td>${registro.periodo === 'manha' ? 'Manhã' : 'Tarde'}</td>
-                        <td>${registro.quantidade.toFixed(1)} L</td>
-                        <td style="white-space: nowrap;">
-                            <button class="btn btn-danger btn-sm" onclick="deleteLeiteRegistro('${registro.id}')"><i class="ph ph-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-        
-        function renderTarefaList() {
-             if (!DOM.tarefaListTbody) return;
-
-             const tarefasPendentes = rebanhoData.tarefas
-                .filter(t => !t.done)
-                .sort((a, b) => new Date(a.data) - new Date(b.data)); // Mais antiga primeiro
-
-            DOM.tarefaListTbody.innerHTML = tarefasPendentes.map(tarefa => {
-                const animal = rebanhoData.animais.find(a => a.id === tarefa.animalId);
-                const animalNome = animal ? `${formatAnimalId(animal.id)} - ${animal.nome}` : 'Animal Excluído';
-                const dataFormatada = new Date(tarefa.data).toLocaleDateString();
-                const hoje = new Date().toISOString().split('T')[0];
-                const cor = tarefa.data < hoje ? 'color: var(--danger-color); font-weight: 700;' : '';
-                
-                return `
-                    <tr style="${cor}">
-                        <td>${dataFormatada}</td>
-                        <td><a href="#" onclick="event.preventDefault(); viewAnimal(${tarefa.animalId})">${animalNome}</a></td>
-                        <td>${tarefa.tipo}</td>
-                        <td>${tarefa.descricao}</td>
-                        <td style="white-space: nowrap;">
-                            <button class="btn btn-success btn-sm" onclick="markTarefaAsDone('${tarefa.id}')"><i class="ph ph-check"></i> Feito</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteTarefa('${tarefa.id}')"><i class="ph ph-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-        
-        function renderProximasTarefas() {
-             if (!DOM.proximasTarefasLista) return;
-
-             const proximas = rebanhoData.tarefas
-                .filter(t => !t.done)
-                .sort((a, b) => new Date(a.data) - new Date(b.data))
-                .slice(0, 5);
-                
-             if (proximas.length === 0) {
-                 DOM.proximasTarefasLista.innerHTML = `<p class="text-secondary">Nenhuma tarefa pendente.</p>`;
-                 return;
-             }
-
-            DOM.proximasTarefasLista.innerHTML = proximas.map(tarefa => {
-                const animal = rebanhoData.animais.find(a => a.id === tarefa.animalId);
-                const animalNome = animal ? `${formatAnimalId(animal.id)} - ${animal.nome}` : 'Animal Excluído';
-                const dataFormatada = new Date(tarefa.data).toLocaleDateString();
-                const hoje = new Date().toISOString().split('T')[0];
-                const cor = tarefa.data < hoje ? 'border-color: var(--danger-color);' : '';
-                
-                return `
-                    <li class="tarefa-item" style="${cor}">
-                        <div class="tarefa-info">
-                            <strong>${tarefa.tipo}: ${tarefa.descricao}</strong>
-                            <div class="tarefa-meta">Para: ${animalNome} | Data: ${dataFormatada}</div>
-                        </div>
-                         <button class="btn btn-success btn-sm" onclick="markTarefaAsDone('${tarefa.id}')"><i class="ph ph-check"></i></button>
-                    </li>
-                `;
-            }).join('');
-        }
-        
-        function renderProximosEventosReprodutivos() {
-            if (!DOM.proximosPartosLista || !DOM.proximosCioLista) return;
-            
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(today.getDate() + 1);
-            const thirtyDaysLater = new Date(today);
-            thirtyDaysLater.setDate(today.getDate() + 30);
-            
-            const proximosPartos = rebanhoData.animais
-                .filter(a => 
-                    a.categoria === 'Vaca' && 
-                    a.statusReprodutivo === 'Prenhe' &&
-                    a.dataPrevisaoParto && 
-                    new Date(a.dataPrevisaoParto) >= tomorrow && 
-                    new Date(a.dataPrevisaoParto) <= thirtyDaysLater
-                )
-                .sort((a, b) => new Date(a.dataPrevisaoParto) - new Date(b.dataPrevisaoParto));
-            
-            DOM.proximosPartosLista.innerHTML = proximosPartos.map(animal => {
-                return `
-                    <li class="tarefa-item danger" onclick="viewAnimal(${animal.id})" style="cursor:pointer; border-color:var(--danger-color);">
-                        <div class="tarefa-info">
-                            <strong>Parto de ${animal.nome}</strong>
-                            <div class="tarefa-meta">Previsto: ${new Date(animal.dataPrevisaoParto).toLocaleDateString()}</div>
-                        </div>
-                    </li>
-                `;
-            }).join('') || `<p class="text-secondary">Nenhum parto previsto para os próximos 30 dias.</p>`;
-
-            // Para previsão de cio, procuramos por vacas que tiveram parto recentemente (Ex: 21 dias após parto)
-            // ou que tiveram uma cobertura/cio recente e estão 'Vazias'.
-            const proximosCio = rebanhoData.animais
-                .filter(a => a.categoria === 'Vaca' && a.statusReprodutivo === 'Vazia' && a.dataUltimoParto)
-                .map(animal => {
-                    const nextCioDate = new Date(animal.dataUltimoParto);
-                    nextCioDate.setDate(nextCioDate.getDate() + 21); // 21 dias pós-parto
-                    
-                    if (nextCioDate >= tomorrow && nextCioDate <= thirtyDaysLater) {
-                        return { 
-                            id: animal.id, 
-                            nome: animal.nome, 
-                            dataCio: nextCioDate.toISOString().split('T')[0] 
-                        };
-                    }
-                    return null;
-                })
-                .filter(c => c !== null)
-                .sort((a, b) => new Date(a.dataCio) - new Date(b.dataCio));
-                
-            DOM.proximosCioLista.innerHTML = proximosCio.map(cio => {
-                return `
-                    <li class="tarefa-item warning" onclick="viewAnimal(${cio.id})" style="cursor:pointer; border-color:var(--warning-color);">
-                        <div class="tarefa-info">
-                            <strong>Cio de ${cio.nome}</strong>
-                            <div class="tarefa-meta">Previsto: ${new Date(cio.dataCio).toLocaleDateString()}</div>
-                        </div>
-                    </li>
-                `;
-            }).join('') || `<p class="text-secondary">Nenhuma previsão de cio para os próximos 30 dias.</p>`;
-        }
-
-
-        // --- Funções de Gráfico (Chart.js) ---
-
-        function initCharts() {
-            initProducaoDiariaChart();
-            initDistribuicaoRebanhoChart();
-            initAnimalProducaoChart();
-        }
-
-        function initProducaoDiariaChart() {
-            if (!DOM.producaoDiariaChartCanvas) return;
-            const ctx = DOM.producaoDiariaChartCanvas.getContext('2d');
-            
-            producaoDiariaChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [], // Datas
-                    datasets: [{
-                        label: 'Litros de Leite',
-                        data: [], // Quantidades
-                        borderColor: '#007bff',
-                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Litros'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-            updateProducaoDiariaChart();
-        }
-        
-        function updateProducaoDiariaChart() {
-            if (!producaoDiariaChart) return;
-
-            const days = 28;
-            const data = rebanhoData.producaoLeite;
-            
-            // Agrega produção por data
-            const dailyProduction = {};
-            data.forEach(p => {
-                const date = p.data;
-                if (!dailyProduction[date]) {
-                    dailyProduction[date] = 0;
-                }
-                dailyProduction[date] += p.quantidade;
-            });
-
-            // Gera labels e dados para os últimos 'days'
-            const labels = [];
-            const dataSet = [];
-            let currentDate = new Date();
-            currentDate.setDate(currentDate.getDate() - days + 1); // Começa 'days' dias atrás
-
-            for (let i = 0; i < days; i++) {
-                const dateString = currentDate.toISOString().split('T')[0];
-                labels.push(new Date(dateString).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }));
-                dataSet.push(dailyProduction[dateString] || 0);
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-
-            producaoDiariaChart.data.labels = labels;
-            producaoDiariaChart.data.datasets[0].data = dataSet;
-            producaoDiariaChart.update();
-            
-            // Atualiza Métrica de Média Diária (Últimos 7 dias)
-            const last7DaysData = dataSet.slice(-7);
-            const total7Days = last7DaysData.reduce((sum, value) => sum + value, 0);
-            const avgDaily = last7DaysData.length > 0 ? (total7Days / last7DaysData.length).toFixed(1) : '0';
-            if (DOM.producaoMediaDiaria) {
-                DOM.producaoMediaDiaria.textContent = `${avgDaily} L`;
-            }
-        }
-
-        function initDistribuicaoRebanhoChart() {
-            if (!DOM.distribuicaoRebanhoChartCanvas) return;
-            const ctx = DOM.distribuicaoRebanhoChartCanvas.getContext('2d');
-
-            distribuicaoRebanhoChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        data: [],
-                        backgroundColor: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'right' }
-                    }
-                }
-            });
-            updateDistribuicaoRebanhoChart();
-        }
-        
-        function updateDistribuicaoRebanhoChart() {
-            if (!distribuicaoRebanhoChart) return;
-            
-            const counts = rebanhoData.animais.reduce((acc, animal) => {
-                acc[animal.categoria] = (acc[animal.categoria] || 0) + 1;
-                return acc;
-            }, {});
-            
-            const labels = Object.keys(counts);
-            const data = Object.values(counts);
-
-            distribuicaoRebanhoChart.data.labels = labels;
-            distribuicaoRebanhoChart.data.datasets[0].data = data;
-            distribuicaoRebanhoChart.update();
-        }
-        
-        function initAnimalProducaoChart() {
-            if (!DOM.animalProducaoChartCanvas) return;
-            const ctx = DOM.animalProducaoChartCanvas.getContext('2d');
-            
-            animalProducaoChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: [], // Datas
-                    datasets: [{
-                        label: 'Litros (Manhã)',
-                        data: [],
-                        backgroundColor: 'rgba(0, 123, 255, 0.6)'
-                    },
-                    {
-                        label: 'Litros (Tarde)',
-                        data: [],
-                        backgroundColor: 'rgba(40, 167, 69, 0.6)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            stacked: true
-                        },
-                        x: {
-                            stacked: true
-                        }
-                    },
-                    plugins: {
-                        legend: { position: 'top' }
-                    }
-                }
-            });
-        }
-        
-        function updateAnimalProducaoChart(animalId) {
-            if (!animalProducaoChart) return;
-            
-            const animalData = rebanhoData.producaoLeite.filter(p => p.animalId === animalId);
-            
-            // Agrega produção por data e período
-            const dailyProduction = {};
-            animalData.forEach(p => {
-                const date = p.data;
-                if (!dailyProduction[date]) {
-                    dailyProduction[date] = { manha: 0, tarde: 0 };
-                }
-                dailyProduction[date][p.periodo] += p.quantidade;
-            });
-            
-            // Filtra para os últimos 14 dias
-            const days = 14;
-            const labels = [];
-            const manhaData = [];
-            const tardeData = [];
-            let currentDate = new Date();
-            currentDate.setDate(currentDate.getDate() - days + 1);
-
-            for (let i = 0; i < days; i++) {
-                const dateString = currentDate.toISOString().split('T')[0];
-                const data = dailyProduction[dateString] || { manha: 0, tarde: 0 };
-                
-                labels.push(new Date(dateString).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }));
-                manhaData.push(data.manha.toFixed(1));
-                tardeData.push(data.tarde.toFixed(1));
-                
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-            
-            animalProducaoChart.data.labels = labels;
-            animalProducaoChart.data.datasets[0].data = manhaData;
-            animalProducaoChart.data.datasets[1].data = tardeData;
-            animalProducaoChart.update();
-        }
-
-
-        // --- Funções de Atualização do Dashboard ---
-
-        function updateDashboard() {
-            if (DOM.totalAnimais) {
-                DOM.totalAnimais.textContent = rebanhoData.animais.length;
-            }
-            
-            const vacasEmLactacao = rebanhoData.animais.filter(a => a.categoria === 'Vaca' && a.statusReprodutivo === 'Em Lactação').length;
-            if (DOM.vacasLactacao) {
-                DOM.vacasLactacao.textContent = vacasEmLactacao;
-            }
-            
-            const tarefasPendentes = rebanhoData.tarefas.filter(t => !t.done).length;
-            if (DOM.tarefasPendentes) {
-                DOM.tarefasPendentes.textContent = tarefasPendentes;
-            }
-            
-            updateProducaoDiariaChart();
-            updateDistribuicaoRebanhoChart();
-            renderProximasTarefas();
-            renderProximosEventosReprodutivos();
-        }
-        
-        // --- Funções de Preenchimento de Selects ---
-        
-        function populateSelects() {
-            populateSelectVacaLactacao();
-            populateTarefaAnimalSelect();
-        }
-
-        function populateSelectVacaLactacao() {
-            if (!DOM.leiteVacaSelect) return;
-            
-            const vacasLactacao = rebanhoData.animais.filter(a => a.categoria === 'Vaca' && a.statusReprodutivo === 'Em Lactação').sort((a, b) => a.nome.localeCompare(b.nome));
-
-            DOM.leiteVacaSelect.innerHTML = '<option value="">Selecione a Vaca...</option>' +
-                vacasLactacao.map(vaca => `
-                    <option value="${vaca.id}">${formatAnimalId(vaca.id)} - ${vaca.nome}</option>
-                `).join('');
-        }
-
-        function populateTarefaAnimalSelect() {
-            if (!DOM.tarefaAnimalSelect) return;
-            
-            const animaisOrdenados = rebanhoData.animais.sort((a, b) => a.nome.localeCompare(b.nome));
-
-            DOM.tarefaAnimalSelect.innerHTML = '<option value="">Selecione o Animal...</option>' +
-                animaisOrdenados.map(animal => `
-                    <option value="${animal.id}">${formatAnimalId(animal.id)} - ${animal.nome} (${animal.categoria})</option>
-                `).join('');
-        }
-
-        // --- Funções de Reprodução e Saúde (Tarefas) ---
-        
-        function saveTarefa(event) {
-            event.preventDefault();
-            
-            const newTarefa = {
-                id: crypto.randomUUID(),
-                animalId: parseInt(DOM.tarefaAnimalSelect.value),
-                tipo: DOM.tarefaTipoSelect.value,
-                data: DOM.tarefaData.value,
-                descricao: DOM.tarefaDescricao.value,
-                done: false
-            };
-            
-            rebanhoData.tarefas.push(newTarefa);
-            showCustomAlert(`Tarefa de ${newTarefa.tipo} para ${formatAnimalId(newTarefa.animalId)} adicionada!`);
-            DOM.tarefaForm.reset();
-            DOM.tarefaData.value = new Date().toISOString().split('T')[0];
-            saveData();
-            renderTarefaList();
-        }
-        
-        function markTarefaAsDone(tarefaId) {
-            showCustomConfirm('Marcar esta tarefa como CONCLUÍDA?', () => {
-                const tarefa = rebanhoData.tarefas.find(t => t.id === tarefaId);
-                if (tarefa) {
-                    tarefa.done = true;
-                    saveData();
-                    showCustomAlert(`Tarefa ${tarefa.id} concluída!`);
-                    renderTarefaList();
-                }
-            });
-        }
-        
-        function deleteTarefa(tarefaId) {
-            showCustomConfirm('Excluir esta tarefa?', () => {
-                rebanhoData.tarefas = rebanhoData.tarefas.filter(t => t.id !== tarefaId);
-                saveData();
-                showCustomAlert(`Tarefa excluída!`);
-                renderTarefaList();
-            });
-        }
-        
-        // --- Funções de Produção de Leite ---
-
-        function saveLeiteRegistro(event) {
+        // Função para salvar registro de leite
+        function saveLeite(event) {
             event.preventDefault();
             
             const animalId = parseInt(DOM.leiteVacaSelect.value);
             const animal = rebanhoData.animais.find(a => a.id === animalId);
 
             if (!animal || animal.statusReprodutivo !== 'Em Lactação') {
-                showCustomAlert('Erro: O animal selecionado não está em Lactação ou não existe.');
+                showCustomAlert('Erro', 'O animal selecionado não está em lactação.', 'warning');
                 return;
             }
-            
-            const newRegistro = {
-                id: crypto.randomUUID(),
+
+            const novoRegistro = {
+                id: Date.now(), // ID simples baseado no timestamp
                 animalId: animalId,
                 data: DOM.leiteDataInput.value,
                 periodo: DOM.leitePeriodoSelect.value,
                 quantidade: parseFloat(DOM.leiteQuantidadeInput.value)
             };
+
+            rebanhoData.producaoLeite.push(novoRegistro);
+            rebanhoData.producaoLeite.sort((a, b) => new Date(b.data) - new Date(a.data)); // Ordena por data mais recente
             
-            rebanhoData.producaoLeite.push(newRegistro);
-            showCustomAlert(`Registro de ${newRegistro.quantidade}L para ${animal.nome} salvo!`);
-            DOM.leiteForm.reset();
-            DOM.leiteDataInput.value = new Date().toISOString().split('T')[0];
+            // Lógica de atualização da lactação do animal
+            const lactacaoIndex = rebanhoData.lactacoes.findIndex(l => l.animalId === animalId && !l.dataFim);
+            if (lactacaoIndex === -1) {
+                // Se a vaca está em lactação mas não tem lactação aberta, abre uma nova
+                rebanhoData.lactacoes.push({
+                    id: Date.now() + 1,
+                    animalId: animalId,
+                    dataInicio: animal.dataUltimoParto || novoRegistro.data,
+                    dataFim: null,
+                    totalLitros: novoRegistro.quantidade
+                });
+            } else {
+                rebanhoData.lactacoes[lactacaoIndex].totalLitros += novoRegistro.quantidade;
+            }
+
             saveData();
+            DOM.leiteForm.reset();
+            populateVacaSelects(); // Mantém o select atualizado
             renderLeiteList();
-            
-            // Verifica e atualiza a lactação
-            updateLactationRecords(animalId, newRegistro.data, newRegistro.quantidade);
+            updateDashboard();
+            showCustomAlert('Sucesso', 'Produção de leite registrada!', 'success');
         }
-        
+
+        // Função para deletar registro de leite
         function deleteLeiteRegistro(registroId) {
-             showCustomConfirm('Excluir este registro de leite?', () => {
-                const registroIndex = rebanhoData.producaoLeite.findIndex(r => r.id === registroId);
-                if (registroIndex !== -1) {
-                    const deletedRegistro = rebanhoData.producaoLeite.splice(registroIndex, 1)[0];
-                    showCustomAlert(`Registro de ${deletedRegistro.quantidade}L excluído.`);
+            showCustomConfirm('Confirmar Exclusão', 'Tem certeza que deseja excluir este registro de produção de leite? Isso afetará o total da lactação.', () => {
+                const registro = rebanhoData.producaoLeite.find(r => r.id === registroId);
+                if (registro) {
+                    // Reverte a contagem de litros na lactação
+                    const lactacaoIndex = rebanhoData.lactacoes.findIndex(l => l.animalId === registro.animalId && !l.dataFim);
+                    if (lactacaoIndex !== -1) {
+                        rebanhoData.lactacoes[lactacaoIndex].totalLitros -= registro.quantidade;
+                        // Opcional: Remover lactação se o total cair a zero e não tiver data de fim
+                        if (rebanhoData.lactacoes[lactacaoIndex].totalLitros <= 0) {
+                             rebanhoData.lactacoes[lactacaoIndex].totalLitros = 0;
+                        }
+                    }
+                    
+                    rebanhoData.producaoLeite = rebanhoData.producaoLeite.filter(r => r.id !== registroId);
                     saveData();
                     renderLeiteList();
-                    // Necessário re-renderizar o histórico do animal se o modal estiver aberto
+                    updateDashboard();
+                    
+                    // Se estiver no modal de visualização do animal, atualiza a lista interna
                     if (DOM.modalAnimalView.style.display === 'flex') {
-                        const animalId = parseInt(DOM.btnEditView.onclick.toString().match(/\((\d+)\)/)[1]);
-                        renderAnimalProducao(animalId);
-                        renderAnimalLactacoes(animalId);
+                        const animalId = parseInt(DOM.btnEditView.dataset.animalId);
+                        viewAnimal(animalId);
+                    }
+                    showCustomAlert('Sucesso', 'Registro de leite excluído.', 'success');
+                }
+            });
+        }
+        
+        // Função para deletar registro de lactação (Usado no modal de visualização)
+        function deleteLactacaoRegistro(lactacaoId, animalId) {
+            showCustomConfirm('Confirmar Exclusão', 'Tem certeza que deseja excluir este registro COMPLETO de lactação? Todos os registros de produção de leite relacionados serão mantidos.', () => {
+                // Apenas remove o registro da tabela de lactação. Os registros diários de leite permanecem no rebanhoData.producaoLeite.
+                rebanhoData.lactacoes = rebanhoData.lactacoes.filter(l => l.id !== lactacaoId);
+                saveData();
+                viewAnimal(animalId); // Re-renderiza a visualização
+                showCustomAlert('Sucesso', 'Registro de lactação excluído.', 'success');
+            });
+        }
+
+
+        // --- Funções de Saúde/Tarefas ---
+
+        // Função para salvar nova tarefa
+        function saveTarefa(event) {
+            event.preventDefault();
+
+            const novaTarefa = {
+                id: Date.now(),
+                animalId: parseInt(DOM.tarefaAnimalSelect.value),
+                tipo: DOM.tarefaTipoSelect.value,
+                data: DOM.tarefaData.value, // Data limite ou previsão
+                descricao: DOM.tarefaDescricao.value,
+                done: false,
+                dataConclusao: null,
+            };
+
+            rebanhoData.tarefas.push(novaTarefa);
+            saveData();
+            DOM.tarefaForm.reset();
+            renderTarefaList();
+            updateDashboard();
+            showCustomAlert('Sucesso', 'Nova tarefa adicionada!', 'success');
+        }
+
+        // Função para marcar tarefa como realizada
+        function markTarefaAsDone(tarefaId) {
+            showCustomConfirm('Confirmar Tarefa', 'Marcar esta tarefa como realizada?', () => {
+                const tarefa = rebanhoData.tarefas.find(t => t.id === tarefaId);
+                if (tarefa) {
+                    tarefa.done = true;
+                    tarefa.dataConclusao = new Date().toISOString().split('T')[0];
+                    saveData();
+                    renderTarefaList();
+                    updateDashboard();
+                    showCustomAlert('Sucesso', 'Tarefa concluída!', 'success');
+                    
+                    // Lógica adicional para eventos reprodutivos
+                    if (tarefa.tipo === 'parto') {
+                        updateAnimalPostParto(tarefa.animalId, tarefa.dataConclusao);
+                    } else if (tarefa.tipo === 'cobertura') {
+                        updateAnimalPostCobertura(tarefa.animalId, tarefa.dataConclusao);
                     }
                 }
             });
         }
+        
+        // Função para deletar tarefa
+        function deleteTarefa(tarefaId) {
+            showCustomConfirm('Confirmar Exclusão', 'Tem certeza que deseja excluir esta tarefa?', () => {
+                rebanhoData.tarefas = rebanhoData.tarefas.filter(t => t.id !== tarefaId);
+                saveData();
+                renderTarefaList();
+                updateDashboard();
+                showCustomAlert('Sucesso', 'Tarefa excluída.', 'success');
+            });
+        }
 
-        // --- Funções de Histórico do Animal ---
-
-        function renderAnimalHistorico(animalId) {
-            if (!DOM.animalHistoricoTimeline) return;
-
+        // Lógica de Negócios: Atualizar status do animal após o parto
+        function updateAnimalPostParto(animalId, dataParto) {
             const animal = rebanhoData.animais.find(a => a.id === animalId);
-            if (!animal) return;
+            if (animal) {
+                animal.statusReprodutivo = 'Em Lactação';
+                animal.dataUltimoParto = dataParto;
+                animal.dataPrevisaoParto = null; // Limpa previsão antiga
+                
+                // Abre uma nova lactação
+                rebanhoData.lactacoes.push({
+                    id: Date.now(),
+                    animalId: animalId,
+                    dataInicio: dataParto,
+                    dataFim: null,
+                    totalLitros: 0
+                });
 
-            let historico = [];
-
-            // Eventos de Tarefas Concluídas (Parto, Cobertura, Diagnóstico, etc.)
-            rebanhoData.tarefas
-                .filter(t => t.animalId === animalId && t.done)
-                .forEach(t => {
-                    historico.push({
-                        date: t.data,
-                        type: t.tipo,
-                        title: t.tipo.toUpperCase(),
-                        description: t.descricao,
-                        isTask: true
-                    });
+                // Cria tarefas futuras (Secagem, Próximo Cio)
+                const dataSecagemPrevista = new Date(dataParto + "T00:00:00");
+                dataSecagemPrevista.setDate(dataSecagemPrevista.getDate() + 305); // Exemplo: 305 dias
+                
+                rebanhoData.tarefas.push({
+                    id: Date.now() + 1,
+                    animalId: animalId,
+                    tipo: 'secagem',
+                    data: dataSecagemPrevista.toISOString().split('T')[0],
+                    descricao: 'Previsão de Secagem (305 dias pós-parto).',
+                    done: false,
+                    dataConclusao: null,
                 });
                 
-            // Eventos de Parto (Baseados no campo do animal, se a tarefa não for usada)
-            if (animal.dataUltimoParto) {
-                 historico.push({
-                    date: animal.dataUltimoParto,
-                    type: 'parto',
-                    title: 'PARTO (Último)',
-                    description: `Animal teve seu último parto. Previsão de cio em ${calculateNextReproDate(animal.dataUltimoParto, 'cio')}.`,
-                    isTask: false
+                rebanhoData.tarefas.push({
+                    id: Date.now() + 2,
+                    animalId: animalId,
+                    tipo: 'cio',
+                    data: calculateNextReproDate(dataParto, 'cio'),
+                    descricao: 'Primeiro Cio pós-parto (aprox. 21 dias).',
+                    done: false,
+                    dataConclusao: null,
                 });
+                
+                showCustomAlert('Ação Adicional', `Animal ${animal.nome} atualizado para 'Em Lactação'. Nova previsão de Secagem e Cio adicionadas.`, 'info');
+                saveData();
             }
-
-            // Agrega os eventos pela data (mais recente primeiro)
-            historico.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            DOM.animalHistoricoTimeline.innerHTML = historico.map(item => {
-                const date = new Date(item.date).toLocaleDateString();
-                return `
-                    <li class="timeline-item ${item.type.toLowerCase()}">
-                        <div class="timeline-date">${date}</div>
-                        <div class="timeline-content">
-                            <h4>${item.title} ${item.isTask ? '(Tarefa Concluída)' : ''}</h4>
-                            <p>${item.description}</p>
-                        </div>
-                    </li>
-                `;
-            }).join('');
         }
         
-        function renderAnimalProducao(animalId) {
-            if (!DOM.animalProducaoList) return;
-            
-            const producaoList = rebanhoData.producaoLeite
-                .filter(p => p.animalId === animalId)
-                .sort((a, b) => new Date(b.data) - new Date(a.data))
-                .slice(0, 15);
-                
-            DOM.animalProducaoList.innerHTML = producaoList.map(registro => {
-                return `
-                    <tr>
-                        <td>${new Date(registro.data).toLocaleDateString()}</td>
-                        <td>${registro.periodo === 'manha' ? 'Manhã' : 'Tarde'}</td>
-                        <td>${registro.quantidade.toFixed(1)} L</td>
-                        <td style="white-space: nowrap;">
-                            <button class="btn btn-danger btn-sm" onclick="deleteLeiteRegistro('${registro.id}')"><i class="ph ph-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            }).join('') || `<tr><td colspan="4">Nenhum registro de produção encontrado.</td></tr>`;
-        }
-        
-        // --- Funções de Lactação ---
-        
-        function updateLactationRecords(animalId, leiteDate, quantidade) {
-            let animalLactations = rebanhoData.lactacoes.filter(l => l.animalId === animalId);
+        // Lógica de Negócios: Atualizar status do animal após a cobertura
+        function updateAnimalPostCobertura(animalId, dataCobertura) {
             const animal = rebanhoData.animais.find(a => a.id === animalId);
-            
-            if (!animal) return;
+            if (animal) {
+                // Remove tarefas de cio pendentes
+                rebanhoData.tarefas = rebanhoData.tarefas.filter(t => t.animalId !== animalId || t.tipo !== 'cio' || t.done);
+                
+                // Adiciona tarefa de Diagnóstico de Gestação
+                const dataDiagnostico = new Date(dataCobertura + "T00:00:00");
+                dataDiagnostico.setDate(dataDiagnostico.getDate() + 45); // Exemplo: 45 dias para diagnóstico
+                
+                rebanhoData.tarefas.push({
+                    id: Date.now(),
+                    animalId: animalId,
+                    tipo: 'diagnostico',
+                    data: dataDiagnostico.toISOString().split('T')[0],
+                    descricao: 'Diagnóstico de gestação (45 dias pós-cobertura).',
+                    done: false,
+                    dataConclusao: null,
+                });
+                
+                showCustomAlert('Ação Adicional', `Tarefa de Diagnóstico adicionada para ${animal.nome}.`, 'info');
+                saveData();
+            }
+        }
 
-            let isCurrentLactationFound = false;
-            
-            // 1. Encontra a lactação atual (aberta ou a mais recente)
-            let currentLactation = animalLactations
-                .filter(l => !l.dataFim) // Filtra lactações abertas
-                .sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio))[0];
 
-            if (currentLactation) {
-                isCurrentLactationFound = true;
+        // --- Funções de Renderização e Atualização ---
+
+        // Renderiza a lista de animais na seção "Animais"
+        function renderAnimalList() {
+            const tbody = DOM.animalListTbody;
+            tbody.innerHTML = '';
+            
+            const filtroCat = DOM.filtroCategoriaSelect.value;
+            const buscaTermo = DOM.buscaAnimalInput.value.toLowerCase();
+
+            rebanhoData.animais.forEach(animal => {
+                const animalIdFormatado = formatAnimalId(animal.id);
+                const animalAge = calculateAge(animal.dataNasc);
+                
+                // Aplica filtros
+                const categoriaMatch = !filtroCat || animal.categoria === filtroCat;
+                const buscaMatch = !buscaTermo || 
+                                   animalIdFormatado.toLowerCase().includes(buscaTermo) || 
+                                   animal.nome.toLowerCase().includes(buscaTermo) ||
+                                   animal.raca.toLowerCase().includes(buscaTermo);
+
+                if (categoriaMatch && buscaMatch) {
+                    const row = tbody.insertRow();
+                    row.onclick = () => viewAnimal(animal.id);
+                    const imgSrc = animal.fotoBase64 || PLACEHOLDER_FOTO;
+
+                    row.innerHTML = `
+                        <td>${animalIdFormatado}</td>
+                       <td><img class="animal-thumb" src="${imgSrc}" alt="Foto ${animal.nome}"></td>
+                        <td>${animal.nome}</td>
+                        <td>${animal.sexo || 'N/D'}</td>
+                        <td>${parentDisplay(animal.parentPaiId)} / ${parentDisplay(animal.parentMaeId)}</td>
+                        <td>${animal.categoria}</td>
+                        <td>${animalAge}</td>
+                        <td>${animal.statusReprodutivo || 'N/D'}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="event.stopPropagation(); openAnimalForm(${animal.id})"><i class="ph ph-pencil"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteAnimal(${animal.id})"><i class="ph ph-trash"></i></button>
+                        </td>
+                    `;
+                }
+            });
+        }
+        
+        // Renderiza a lista de registros de leite na seção "Produção"
+        function renderLeiteList() {
+            const tbody = DOM.leiteListTbody;
+            tbody.innerHTML = '';
+            
+            // Exibir apenas os últimos 50 registros
+            const registrosParaExibir = rebanhoData.producaoLeite.slice(0, 50);
+
+            registrosParaExibir.forEach(registro => {
+                const animalName = getAnimalName(registro.animalId);
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${formatDate(registro.data)}</td>
+                    <td>${animalName}</td>
+                    <td>${registro.periodo.charAt(0).toUpperCase() + registro.periodo.slice(1)}</td>
+                    <td>${registro.quantidade.toFixed(2)} L</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteLeiteRegistro(${registro.id})"><i class="ph ph-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+        
+        // Renderiza a lista de tarefas pendentes na seção "Saúde"
+        function renderTarefaList() {
+            const tbody = DOM.tarefaListTbody;
+            tbody.innerHTML = '';
+            
+            // Filtra e ordena as tarefas pendentes
+            const tarefasPendentes = rebanhoData.tarefas
+                .filter(t => !t.done)
+                .sort((a, b) => new Date(a.data) - new Date(b.data)); // Ordena pela data mais próxima
+
+            tarefasPendentes.forEach(tarefa => {
+                const animalName = getAnimalName(tarefa.animalId);
+                const isLate = new Date(tarefa.data) < new Date().setHours(0,0,0,0);
+                
+                const row = tbody.insertRow();
+                row.className = isLate ? 'table-danger' : ''; // Estilo para tarefas atrasadas
+                row.innerHTML = `
+                    <td>${formatDate(tarefa.data)}</td>
+                    <td>${animalName}</td>
+                    <td>${tarefa.tipo.charAt(0).toUpperCase() + tarefa.tipo.slice(1)}</td>
+                    <td>${tarefa.descricao}</td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="event.stopPropagation(); markTarefaAsDone(${tarefa.id})"><i class="ph ph-check"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteTarefa(${tarefa.id})"><i class="ph ph-trash"></i></button>
+                    </td>
+                `;
+            });
+            
+            // Atualiza a lista de tarefas no Dashboard
+            renderProximasTarefas(tarefasPendentes.slice(0, 5));
+        }
+        
+        // Renderiza a lista de tarefas no Dashboard
+        function renderProximasTarefas(tarefas) {
+            DOM.proximasTarefasLista.innerHTML = '';
+            if (tarefas.length === 0) {
+                 DOM.proximasTarefasLista.innerHTML = '<p class="text-secondary">Nenhuma tarefa pendente nas próximas semanas.</p>';
+                 DOM.tarefasPendentes.textContent = 0;
+                 DOM.tarefasPendentes.closest('.metric-card').classList.remove('warning');
+                 DOM.tarefasPendentes.closest('.metric-card').classList.add('success');
+                return;
+            }
+            
+            tarefas.forEach(tarefa => {
+                const animalName = getAnimalName(tarefa.animalId);
+                const item = document.createElement('li');
+                item.className = 'tarefa-item';
+                item.innerHTML = `
+                    <div class="tarefa-info">
+                        <strong>${tarefa.tipo.charAt(0).toUpperCase() + tarefa.tipo.slice(1)} - ${animalName}</strong>
+                        <span class="tarefa-meta">Data: ${formatDate(tarefa.data)}</span>
+                    </div>
+                    <div class="tarefa-actions">
+                        <button class="btn btn-success btn-sm" onclick="event.stopPropagation(); markTarefaAsDone(${tarefa.id})"><i class="ph ph-check"></i></button>
+                    </div>
+                `;
+                DOM.proximasTarefasLista.appendChild(item);
+            });
+            
+            // Atualiza o contador do dashboard
+            const totalPendentes = rebanhoData.tarefas.filter(t => !t.done).length;
+            DOM.tarefasPendentes.textContent = totalPendentes;
+            DOM.tarefasPendentes.closest('.metric-card').classList.toggle('warning', totalPendentes > 0);
+             DOM.tarefasPendentes.closest('.metric-card').classList.toggle('success', totalPendentes === 0);
+        }
+
+        // Renderiza as previsões de parto e cio no Dashboard
+        function renderProximosEventosReprodutivos() {
+            DOM.proximosPartosLista.innerHTML = '';
+            DOM.proximosCioLista.innerHTML = '';
+
+            const today = new Date().setHours(0,0,0,0);
+            const limit30Days = new Date();
+            limit30Days.setDate(limit30Days.getDate() + 30);
+
+            // 1. Partos Previstos (baseado no campo animal.dataPrevisaoParto)
+            const proximosPartos = rebanhoData.animais
+                .filter(a => a.dataPrevisaoParto && new Date(a.dataPrevisaoParto) >= today && new Date(a.dataPrevisaoParto) <= limit30Days)
+                .sort((a, b) => new Date(a.dataPrevisaoParto) - new Date(b.dataPrevisaoParto));
+            
+            if (proximosPartos.length === 0) {
+                 DOM.proximosPartosLista.innerHTML = '<p class="text-secondary">Nenhum parto previsto nos próximos 30 dias.</p>';
             } else {
-                // 2. Se não houver lactação aberta, cria uma nova (só se o animal estiver em lactação)
-                if (animal.statusReprodutivo === 'Em Lactação') {
-                    // Tenta usar a data do último parto, se disponível
-                    const dataInicio = animal.dataUltimoParto || leiteDate;
-                    currentLactation = {
-                        id: crypto.randomUUID(),
-                        animalId: animalId,
-                        dataInicio: dataInicio,
-                        dataFim: null,
-                        partoId: null, // Pode ser associado a uma tarefa de parto
-                        totalLitros: 0
-                    };
-                    rebanhoData.lactacoes.push(currentLactation);
+                 proximosPartos.forEach(animal => {
+                    const item = document.createElement('li');
+                    item.className = 'tarefa-item';
+                    item.innerHTML = `
+                        <div class="tarefa-info" onclick="viewAnimal(${animal.id})">
+                            <strong>Parto de ${animal.nome} (${formatAnimalId(animal.id)})</strong>
+                            <span class="tarefa-meta">Data Prevista: ${formatDate(animal.dataPrevisaoParto)}</span>
+                        </div>
+                    `;
+                    DOM.proximosPartosLista.appendChild(item);
+                });
+            }
+
+            // 2. Cios Previstos (baseado nas tarefas de cio)
+            const proximosCios = rebanhoData.tarefas
+                .filter(t => t.tipo === 'cio' && !t.done && new Date(t.data) >= today && new Date(t.data) <= limit30Days)
+                .sort((a, b) => new Date(a.data) - new Date(b.data));
+
+             if (proximosCios.length === 0) {
+                 DOM.proximosCioLista.innerHTML = '<p class="text-secondary">Nenhum cio previsto nos próximos 30 dias (tarefas).</p>';
+            } else {
+                proximosCios.forEach(tarefa => {
+                    const animalName = getAnimalName(tarefa.animalId);
+                    const item = document.createElement('li');
+                    item.className = 'tarefa-item';
+                    item.innerHTML = `
+                        <div class="tarefa-info" onclick="viewAnimal(${tarefa.animalId})">
+                            <strong>Cio de ${animalName} (${formatAnimalId(tarefa.animalId)})</strong>
+                            <span class="tarefa-meta">Data Prevista: ${formatDate(tarefa.data)}</span>
+                        </div>
+                    `;
+                    DOM.proximosCioLista.appendChild(item);
+                });
+            }
+        }
+
+        // Popula selects de animais em lactação (Produção de Leite)
+        function populateVacaSelects() {
+            const vacasEmLactacao = rebanhoData.animais.filter(a => a.statusReprodutivo === 'Em Lactação');
+            
+            // Limpa e repopula o select de leite
+            DOM.leiteVacaSelect.innerHTML = '<option value="">Selecione a Vaca...</option>';
+            vacasEmLactacao.forEach(animal => {
+                const option = document.createElement('option');
+                option.value = animal.id;
+                option.textContent = `${formatAnimalId(animal.id)} - ${animal.nome}`;
+                DOM.leiteVacaSelect.appendChild(option);
+            });
+            
+            // Limpa e repopula o select de tarefas (inclui todos os animais)
+            DOM.tarefaAnimalSelect.innerHTML = '<option value="">Selecione o Animal...</option>';
+            rebanhoData.animais.forEach(animal => {
+                const option = document.createElement('option');
+                option.value = animal.id;
+                option.textContent = `${formatAnimalId(animal.id)} - ${animal.nome}`;
+                DOM.tarefaAnimalSelect.appendChild(option);
+            });
+             populateParentSelects();
+        
+        }
+        function populateParentSelects(excludeId = null) {
+            if (!DOM.parentPaiSelect || !DOM.parentMaeSelect) return;
+
+            const makeOptions = (select) => {
+                select.innerHTML = '<option value="">Nenhum</option>';
+               rebanhoData.animais.forEach(animal => {
+                    if (excludeId && animal.id === excludeId) return; // não permitir selecionar o próprio animal como pai/mãe
+                    const opt = document.createElement('option');
+                    opt.value = animal.id;
+                    opt.textContent = `${formatAnimalId(animal.id)} - ${animal.nome}`;
+                    select.appendChild(opt);
+                });
+            };
+
+            makeOptions(DOM.parentPaiSelect);
+            makeOptions(DOM.parentMaeSelect);
+        }
+        
+        // Helper para exibir Pai/Mãe em listas
+        function parentDisplay(id) {
+            if (!id) return '—';
+            return `${formatAnimalId(id)} - ${getAnimalName(id)}`;
+        }
+        // Combinação de todos os selectors
+        function updateAllSelectors() {
+            populateVacaSelects();
+            populateParentSelects();
+        }
+
+        // --- Funções de Gráficos ---
+
+        // Cria/Atualiza Gráfico de Produção Diária (Dashboard)
+        function updateProducaoDiariaChart() {
+            const dailyData = rebanhoData.producaoLeite.reduce((acc, curr) => {
+                // Soma a produção do dia, ignorando o período
+                acc[curr.data] = (acc[curr.data] || 0) + curr.quantidade;
+                return acc;
+            }, {});
+
+            // Gera rótulos das últimas 4 semanas (28 dias)
+            const labels = [];
+            const dataPoints = [];
+            for (let i = 27; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const isoDate = date.toISOString().split('T')[0];
+                labels.push(formatDate(isoDate));
+                dataPoints.push(dailyData[isoDate] || 0);
+            }
+
+            const chartData = {
+                labels: labels,
+                datasets: [{
+                    label: 'Produção Total Diária (Litros)',
+                    data: dataPoints,
+                    backgroundColor: 'rgba(40, 167, 69, 0.5)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 1,
+                    tension: 0.4,
+                    fill: true
+                }]
+            };
+
+            const config = {
+                type: 'line',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Litros (L)' } }
+                    }
                 }
-            }
-            
-            // 3. Adiciona a produção à lactação
-            if (currentLactation) {
-                // Garante que o registro de leite não seja anterior ao início da lactação
-                if (leiteDate >= currentLactation.dataInicio) {
-                    currentLactation.totalLitros = (currentLactation.totalLitros || 0) + quantidade;
-                }
-            }
-            
-            // 4. Verifica se a lactação foi fechada (Secagem)
-            if (animal.statusReprodutivo === 'Seca' && currentLactation && !currentLactation.dataFim) {
-                currentLactation.dataFim = animal.dataSecagem || leiteDate; // Usa data da secagem ou a data do registro de leite
-            }
-            
-            // Se houver alguma mudança, salva.
-            if (isCurrentLactationFound || currentLactation) {
-                saveData();
+            };
+
+            if (producaoDiariaChart) {
+                producaoDiariaChart.data = chartData;
+                producaoDiariaChart.update();
+            } else {
+                producaoDiariaChart = new Chart(DOM.producaoDiariaChartCanvas, config);
             }
         }
         
-        function renderAnimalLactacoes(animalId) {
-             if (!DOM.animalLactacoesList) return;
+        // Cria/Atualiza Gráfico de Distribuição do Rebanho
+        function updateDistribuicaoRebanhoChart() {
+            const counts = rebanhoData.animais.reduce((acc, curr) => {
+                acc[curr.categoria] = (acc[curr.categoria] || 0) + 1;
+                return acc;
+            }, {});
 
-             const lactacoesList = rebanhoData.lactacoes
-                .filter(l => l.animalId === animalId)
-                .sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio)); // Mais recente primeiro
+            const categories = Object.keys(counts);
+            const dataPoints = Object.values(counts);
 
-            DOM.animalLactacoesList.innerHTML = lactacoesList.map(lactacao => {
-                const dataInicio = new Date(lactacao.dataInicio).toLocaleDateString();
-                const dataFim = lactacao.dataFim ? new Date(lactacao.dataFim).toLocaleDateString() : 'Em Aberto';
-                
-                return `
-                    <tr>
-                        <td>${dataInicio}</td>
-                        <td>${dataFim}</td>
-                        <td>${lactacao.partoId || 'N/D'}</td>
-                        <td>${lactacao.totalLitros ? lactacao.totalLitros.toFixed(1) + ' L' : '0 L'}</td>
-                        <td style="white-space: nowrap;">
-                            <button class="btn btn-danger btn-sm" onclick="deleteLactacaoRegistro('${lactacao.id}')"><i class="ph ph-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            }).join('') || `<tr><td colspan="5">Nenhum registro de lactação.</td></tr>`;
+            const chartData = {
+                labels: categories,
+                datasets: [{
+                    data: dataPoints,
+                    backgroundColor: [
+                        '#007bff', // Vaca
+                        '#28a745', // Novilha
+                        '#ffc107', // Bezerro(a)
+                        '#dc3545'  // Boi
+                    ],
+                    hoverOffset: 4
+                }]
+            };
+
+            const config = {
+                type: 'doughnut',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: false }
+                    }
+                }
+            };
+
+            if (distribuicaoRebanhoChart) {
+                distribuicaoRebanhoChart.data = chartData;
+                distribuicaoRebanhoChart.update();
+            } else {
+                distribuicaoRebanhoChart = new Chart(DOM.distribuicaoRebanhoChartCanvas, config);
+            }
         }
 
-        function deleteLactacaoRegistro(lactacaoId) {
-             showCustomConfirm('Excluir este registro de lactação? Atenção: isso não remove os registros de leite associados.', () => {
-                rebanhoData.lactacoes = rebanhoData.lactacoes.filter(l => l.id !== lactacaoId);
-                saveData();
-                showCustomAlert(`Registro de lactação excluído!`);
-                // Necessário re-renderizar o histórico do animal se o modal estiver aberto
-                if (DOM.modalAnimalView.style.display === 'flex') {
-                    const animalId = parseInt(DOM.btnEditView.onclick.toString().match(/\((\d+)\)/)[1]);
-                    renderAnimalLactacoes(animalId);
+        // Cria/Atualiza Gráfico de Produção do Animal (Modal View)
+        function updateAnimalProducaoChart(animalId) {
+            const animalProducao = rebanhoData.producaoLeite
+                .filter(p => p.animalId === animalId)
+                .sort((a, b) => new Date(a.data) - new Date(b.data));
+
+            // Agrega por dia
+            const dailyData = animalProducao.reduce((acc, curr) => {
+                acc[curr.data] = (acc[curr.data] || 0) + curr.quantidade;
+                return acc;
+            }, {});
+            
+            // Exibe apenas os últimos 30 dias ou 30 pontos de dados únicos
+            const uniqueDates = Object.keys(dailyData).sort().slice(-30);
+
+            const labels = uniqueDates.map(date => formatDate(date));
+            const dataPoints = uniqueDates.map(date => dailyData[date]);
+
+            const chartData = {
+                labels: labels,
+                datasets: [{
+                    label: 'Produção Diária (L)',
+                    data: dataPoints,
+                    backgroundColor: 'rgba(0, 123, 255, 0.6)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 1,
+                    tension: 0.4,
+                    pointRadius: 3,
+                    fill: false
+                }]
+            };
+
+            const config = {
+                type: 'line',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                    },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Litros (L)' } },
+                        x: { display: true, title: { display: true, text: 'Data' } }
+                    }
                 }
+            };
+
+            if (animalProducaoChart) {
+                animalProducaoChart.destroy(); // Destrói o anterior para garantir a atualização
+            }
+            animalProducaoChart = new Chart(DOM.animalProducaoChartCanvas, config);
+            
+            // Renderiza a lista de produção no modal
+            renderAnimalProducaoList(animalProducao.slice(-15).reverse());
+        }
+        
+        // Renderiza a lista de produção dentro do modal de visualização
+        function renderAnimalProducaoList(producao) {
+            DOM.animalProducaoList.innerHTML = '';
+            producao.forEach(registro => {
+                const row = DOM.animalProducaoList.insertRow();
+                row.innerHTML = `
+                    <td>${formatDate(registro.data)}</td>
+                    <td>${registro.periodo.charAt(0).toUpperCase() + registro.periodo.slice(1)}</td>
+                    <td>${registro.quantidade.toFixed(2)} L</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteLeiteRegistro(${registro.id})"><i class="ph ph-trash"></i></button>
+                    </td>
+                `;
             });
         }
 
 
-        // --- Funções de Câmera/Foto ---
+        // --- Funções de Dashboard e Resumo ---
+
+        // Atualiza as métricas e gráficos do Dashboard
+        function updateDashboard() {
+            // Métrica 1: Total de Animais
+            DOM.totalAnimais.textContent = rebanhoData.animais.length;
+
+            // Métrica 2: Vacas em Lactação
+            const vacasEmLactacao = rebanhoData.animais.filter(a => a.statusReprodutivo === 'Em Lactação').length;
+            DOM.vacasLactacao.textContent = vacasEmLactacao;
+            
+            // Métrica 3: Tarefas Pendentes (atualizado em renderTarefaList)
+            renderTarefaList(); 
+
+            // Métrica 4: Média Diária (Últimos 7 dias)
+            let totalLitros7Dias = 0;
+            const dailyData = rebanhoData.producaoLeite.reduce((acc, curr) => {
+                acc[curr.data] = (acc[curr.data] || 0) + curr.quantidade;
+                return acc;
+            }, {});
+
+            let daysWithProduction = 0;
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const isoDate = date.toISOString().split('T')[0];
+                const amount = dailyData[isoDate] || 0;
+                totalLitros7Dias += amount;
+                if (amount > 0) daysWithProduction++;
+            }
+            
+            const mediaDiaria = daysWithProduction > 0 ? (totalLitros7Dias / daysWithProduction) : 0;
+            DOM.producaoMediaDiaria.textContent = `${mediaDiaria.toFixed(2)} L`;
+            
+            // Atualiza gráficos
+            updateProducaoDiariaChart();
+            updateDistribuicaoRebanhoChart();
+            renderProximosEventosReprodutivos();
+        }
+
+        // --- Funções do Modal de Visualização de Animal ---
+
+        // Função para visualização de animal (popula o modal)
+        function viewAnimal(animalId) {
+            const animal = rebanhoData.animais.find(a => a.id === animalId);
+            if (!animal) {
+                showCustomAlert('Erro', 'Animal não encontrado.', 'danger');
+                return;
+            }
+
+            DOM.viewAnimalTitle.textContent = `Detalhes de ${animal.nome} (${formatAnimalId(animal.id)})`;
+            DOM.btnEditView.dataset.animalId = animal.id;
+            DOM.btnDeleteView.dataset.animalId = animal.id;
+
+            // Detalhes
+            DOM.viewAnimalDetails.innerHTML = `
+                <dt>ID</dt><dd>${formatAnimalId(animal.id)}</dd>
+                <dt>Sexo</dt><dd>${animal.sexo || 'N/D'}</dd>
+                dt>Pai</dt><dd>${parentDisplay(animal.parentPaiId)}</dd>
+                <dt>Mãe</dt><dd>${parentDisplay(animal.parentMaeId)}</dd>
+                <dt>Raça</dt><dd>${animal.raca}</dd>
+                <dt>Categoria</dt><dd>${animal.categoria}</dd>
+                <dt>Idade</dt><dd>${calculateAge(animal.dataNasc)}</dd>
+                <dt>Peso</dt><dd>${animal.peso} Kg</dd>
+                <dt>Status Reprodutivo</dt><dd>${animal.statusReprodutivo || 'N/D'}</dd>
+                <dt>Último Parto</dt><dd>${formatDate(animal.dataUltimoParto)}</dd>
+                <dt>Previsão Parto</dt><dd>${formatDate(animal.dataPrevisaoParto)}</dd>
+                <dt>DEL</dt><dd>${animal.dataUltimoParto ? calculateDaysInMilk(animal.dataUltimoParto) + ' dias' : 'N/D'}</dd>
+                `;
+
+            // Foto
+            DOM.viewAnimalFoto.src = animal.fotoBase64 || PLACEHOLDER_FOTO;
+            
+            // Abas de Conteúdo
+            setupAnimalViewTabs(animal);
+            
+            DOM.modalAnimalView.style.display = 'flex';
+        }
+
+        // Configura as abas de histórico, produção e lactação no modal de visualização
+        function setupAnimalViewTabs(animal) {
+            const tabs = DOM.animalViewTabsContainer.querySelectorAll('.animal-view-tab-btn');
+            const contents = document.querySelectorAll('#modal-animal-view .animal-view-tab-content');
+            
+            // Função para alternar conteúdo da aba
+            const switchTab = (tabName) => {
+                tabs.forEach(btn => btn.classList.remove('active'));
+                contents.forEach(content => content.style.display = 'none');
+                
+                const activeTab = document.querySelector(`.animal-view-tab-btn[data-tab="${tabName}"]`);
+                const activeContent = document.getElementById(tabName);
+                
+                if (activeTab) activeTab.classList.add('active');
+                if (activeContent) activeContent.style.display = 'block';
+
+                // Renderização condicional
+                if (tabName === 'producao-tab') {
+                    updateAnimalProducaoChart(animal.id);
+                } else if (tabName === 'historico') {
+                    renderAnimalHistorico(animal);
+                } else if (tabName === 'lactacoes') {
+                    renderAnimalLactacoes(animal.id);
+                }
+            };
+            
+            // Adiciona listeners aos botões
+            tabs.forEach(btn => {
+                btn.onclick = () => switchTab(btn.dataset.tab);
+            });
+            
+            // Mostra a primeira aba por padrão e renderiza seu conteúdo
+            switchTab(tabs[0].dataset.tab);
+        }
+
+        // Renderiza a Timeline de Histórico de Eventos
+        function renderAnimalHistorico(animal) {
+            const timeline = DOM.animalHistoricoTimeline;
+            timeline.innerHTML = '';
+            
+            // Coleta eventos
+            let events = [];
+            
+            // Adiciona tarefas realizadas como eventos
+            rebanhoData.tarefas
+                .filter(t => t.animalId === animal.id && t.done && t.dataConclusao)
+                .forEach(t => events.push({
+                    date: t.dataConclusao,
+                    type: t.tipo,
+                    title: t.tipo.charAt(0).toUpperCase() + t.tipo.slice(1) + ' Realizado',
+                    description: t.descricao || 'N/D'
+                }));
+
+            // Adiciona registros de lactação (parto) como evento
+             rebanhoData.lactacoes
+                .filter(l => l.animalId === animal.id)
+                .forEach(l => events.push({
+                    date: l.dataInicio,
+                    type: 'parto',
+                    title: `Início da Lactação (Parto)`,
+                    description: `Duração: ${l.dataFim ? calculateDaysInMilk(l.dataInicio, l.dataFim) + ' dias' : 'Em curso'}. Total: ${l.totalLitros.toFixed(2)} L.`
+                }));
+
+            // Adiciona outros eventos de reprodução importantes do animal
+            if (animal.dataAquisicao) {
+                 events.push({
+                    date: animal.dataAquisicao,
+                    type: 'outro',
+                    title: 'Aquisição do Animal',
+                    description: `Animal adquirido na fazenda/mercado. Peso: ${animal.peso} Kg.`
+                });
+            }
+            
+            // Ordena os eventos por data (mais recente primeiro)
+            events.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (events.length === 0) {
+                 timeline.innerHTML = '<p class="text-secondary">Nenhum evento registrado para este animal.</p>';
+                 return;
+            }
+
+            events.forEach(event => {
+                const item = document.createElement('li');
+                item.className = `timeline-item ${event.type}`;
+                item.innerHTML = `
+                    <div class="timeline-date">${formatDate(event.date)}</div>
+                    <div class="timeline-content">
+                        <h4>${event.title}</h4>
+                        <p>${event.description}</p>
+                    </div>
+                `;
+                timeline.appendChild(item);
+            });
+        }
+        
+        // Renderiza a Lista de Lactações (no modal de visualização)
+        function renderAnimalLactacoes(animalId) {
+            const tbody = DOM.animalLactacoesList;
+            tbody.innerHTML = '';
+            
+            const lactacoes = rebanhoData.lactacoes
+                .filter(l => l.animalId === animalId)
+                .sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio));
+
+            if (lactacoes.length === 0) {
+                 tbody.innerHTML = '<tr><td colspan="5" class="text-secondary" style="text-align: center;">Nenhum registro de lactação.</td></tr>';
+                 return;
+            }
+
+            lactacoes.forEach(lactacao => {
+                const isCurrent = !lactacao.dataFim;
+                const status = isCurrent ? 'Em Curso' : formatDate(lactacao.dataFim);
+                const diasEmLactacao = isCurrent 
+                    ? calculateDaysInMilk(lactacao.dataInicio)
+                    : calculateDaysInMilk(lactacao.dataInicio, lactacao.dataFim); // Reusa a função para calcular diferença entre duas datas (melhoria)
+                
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${formatDate(lactacao.dataInicio)}</td>
+                    <td>${status} (${diasEmLactacao} dias)</td>
+                    <td>Parto (${formatDate(lactacao.dataInicio)})</td>
+                    <td>${lactacao.totalLitros.toFixed(2)} L</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteLactacaoRegistro(${lactacao.id}, ${animalId})"><i class="ph ph-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+
+        // --- Funções de Imagem/Câmera ---
 
         function previewFoto(event) {
             const file = event.target.files[0];
@@ -2193,576 +2803,368 @@
                 reader.onload = function(e) {
                     DOM.fotoPreview.src = e.target.result;
                     DOM.fotoPreview.style.display = 'block';
-                }
+                };
                 reader.readAsDataURL(file);
             } else {
+                DOM.fotoPreview.src = PLACEHOLDER_FOTO;
                 DOM.fotoPreview.style.display = 'none';
-                DOM.fotoPreview.src = '';
             }
         }
-        
-        function stopCamera() {
-             if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-                videoStream = null;
-            }
-            if (DOM.cameraVideo) DOM.cameraVideo.style.display = 'none';
-            if (DOM.cameraCanvas) DOM.cameraCanvas.style.display = 'none';
-            if (DOM.btnTirarFoto) DOM.btnTirarFoto.style.display = 'none';
-            if (DOM.btnCancelarCamera) DOM.btnCancelarCamera.style.display = 'none';
-        }
 
-        async function capturarImagem() {
-            if (!DOM.cameraVideo || !DOM.cameraCanvas || !DOM.btnTirarFoto || !DOM.btnCancelarCamera) return;
-
-            // Para iOS/iPhones, o acesso à câmera pode ser limitado.
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                 showCustomAlert('Seu navegador não suporta captura de câmera ou o acesso foi negado.');
-                 return;
-            }
-
-            try {
-                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        function capturarImagem() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // Esconde o input de arquivo e o preview
+                DOM.animalFotoInput.style.display = 'none';
+                DOM.fotoPreview.style.display = 'none';
                 
-                DOM.cameraVideo.srcObject = videoStream;
+                // Mostra vídeo, canvas e botões da câmera
                 DOM.cameraVideo.style.display = 'block';
                 DOM.btnTirarFoto.style.display = 'inline-flex';
                 DOM.btnCancelarCamera.style.display = 'inline-flex';
+                
+                // Inicia o stream da câmera
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }) // Prioriza câmera traseira
+                    .then(stream => {
+                        videoStream = stream;
+                        DOM.cameraVideo.srcObject = stream;
+                    })
+                    .catch(err => {
+                        console.error("Erro ao acessar a câmera: ", err);
+                        showCustomAlert('Erro de Câmera', 'Não foi possível acessar a câmera do dispositivo.', 'danger');
+                        cancelarCaptura();
+                    });
+            } else {
+                 showCustomAlert('Erro', 'Seu navegador não suporta acesso à câmera.', 'danger');
+            }
+        }
+
+        function tirarFoto() {
+            if (videoStream) {
+                // Configura o canvas para a dimensão do vídeo
+                DOM.cameraCanvas.width = DOM.cameraVideo.videoWidth;
+                DOM.cameraCanvas.height = DOM.cameraVideo.videoHeight;
+                
+                // Desenha o frame do vídeo no canvas
+                const context = DOM.cameraCanvas.getContext('2d');
+                context.drawImage(DOM.cameraVideo, 0, 0, DOM.cameraCanvas.width, DOM.cameraCanvas.height);
+                
+                // Converte o conteúdo do canvas para Base64 (JPG)
+                const dataUrl = DOM.cameraCanvas.toDataURL('image/jpeg', 0.8);
+                
+                // Define a imagem capturada como o preview
+                DOM.fotoPreview.src = dataUrl;
+                DOM.fotoPreview.style.display = 'block';
+                
+                // Finaliza e esconde a câmera
+                cancelarCaptura(false); // Não mostra alerta de cancelamento
+            }
+        }
+
+        function cancelarCaptura(showManualInput = true) {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            
+            // Esconde elementos da câmera
+            DOM.cameraVideo.style.display = 'none';
+            DOM.btnTirarFoto.style.display = 'none';
+            DOM.btnCancelarCamera.style.display = 'none';
+
+            // Mostra o input de arquivo novamente
+            DOM.animalFotoInput.style.display = 'block';
+            
+            // Se não houver preview, mostra o placeholder
+            if (showManualInput && !DOM.fotoPreview.src) {
+                DOM.fotoPreview.src = PLACEHOLDER_FOTO;
                 DOM.fotoPreview.style.display = 'none';
-                
-                DOM.btnTirarFoto.onclick = () => {
-                    if (!DOM.cameraVideo || !DOM.cameraCanvas) return;
-
-                    const video = DOM.cameraVideo;
-                    const canvas = DOM.cameraCanvas;
-
-                    // Ajusta o tamanho do canvas para o tamanho do vídeo
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    
-                    // Converte para Base64 e define como preview
-                    const fotoBase64 = canvas.toDataURL('image/png');
-                    DOM.fotoPreview.src = fotoBase64;
-                    DOM.fotoPreview.style.display = 'block';
-                    
-                    // Para o stream
-                    stopCamera();
-                };
-                
-                DOM.btnCancelarCamera.onclick = stopCamera;
-
-            } catch (err) {
-                console.error("Erro ao acessar a câmera: ", err);
-                showCustomAlert('Erro ao acessar a câmera. Verifique as permissões.');
-                stopCamera();
             }
         }
 
 
-        // --- Funções de Importação/Exportação/Relatórios ---
-        
-        function downloadFile(content, filename, mimeType) {
-            const blob = new Blob([content], { type: mimeType });
+        // --- Funções de Importação/Exportação/Reset ---
+
+        // Exporta todos os dados (JSON)
+        function exportDataToJson() {
+            const dataStr = JSON.stringify(rebanhoData, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = filename;
+            a.download = `rebanho_backup_${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            showCustomAlert('Sucesso', 'Dados exportados em formato JSON!', 'success');
         }
 
-        function exportDataToJson() {
-            const dataString = JSON.stringify(rebanhoData, null, 2);
-            downloadFile(dataString, `rebanho_backup_${new Date().toISOString().split('T')[0]}.json`, 'application/json');
-            showCustomAlert('Dados exportados com sucesso!');
-        }
-        
-        function importDataFromJson(event) {
-            event.preventDefault();
-            const file = DOM.inputImportarDados.files[0];
-            if (!file) return;
-
-            if (!file.name.endsWith('.json')) {
-                showCustomAlert('Por favor, selecione um arquivo JSON válido.');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    if (importedData.animais && importedData.producaoLeite && importedData.tarefas) {
-                        showCustomConfirm('ATENÇÃO: Isso substituirá TODOS os dados atuais. Deseja continuar?', () => {
-                            rebanhoData = importedData;
-                            // Garante que o nextAnimalId seja consistente
-                            const maxId = rebanhoData.animais.reduce((max, a) => Math.max(max, a.id), 0);
-                            rebanhoData.nextAnimalId = maxId + 1;
-                            saveData();
-                            DOM.inputImportarDados.value = ''; // Limpa o input
-                            DOM.btnImportarDados.disabled = true;
-                            showCustomAlert('Dados importados com sucesso! A aplicação foi atualizada.');
-                        });
-                    } else {
-                        showCustomAlert('O arquivo JSON não parece ser um backup válido do rebanho.');
-                    }
-                } catch (error) {
-                    showCustomAlert('Erro ao processar o arquivo JSON: ' + error.message);
-                }
-            };
-            reader.readAsText(file);
-        }
-        
-        function importDataFromCsv(event) {
-             event.preventDefault();
-            DOM.modalImportarCsv.style.display = 'none';
-
-            const file = DOM.inputImportarCsv.files[0];
-            if (!file) {
-                 showCustomAlert('Nenhum arquivo CSV selecionado.');
-                 return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const csvContent = e.target.result;
-                    const lines = csvContent.split('\n').filter(line => line.trim() !== '');
-                    
-                    if (lines.length <= 1) {
-                         showCustomAlert('O arquivo CSV está vazio ou tem apenas o cabeçalho.');
-                         return;
-                    }
-
-                    // Ignora o cabeçalho (primeira linha)
-                    const dataLines = lines.slice(1);
-                    const importedAnimais = [];
-                    
-                    dataLines.forEach(line => {
-                        const values = line.split(';').map(v => v.trim()); // Assume separador ';'
-                        
-                        // O CSV deve ter pelo menos ID, Nome, Raça, Categoria, Peso, DataNasc (6 colunas)
-                        if (values.length >= 6) {
-                            const [idStr, nome, raca, categoria, pesoStr, dataNasc, dataAquisicao, statusReprodutivo, dataUltimoParto, dataSecagem, dataPrevisaoParto] = values;
-                            
-                            // Tenta parsear o ID como número. Se for um ID de texto, ignora e o sistema atribuirá um novo.
-                            let id = parseInt(idStr) || null;
-                            const peso = parseFloat(pesoStr) || 0;
-                            
-                            // Adiciona como novo animal (ignora ID do CSV e deixa o sistema atribuir)
-                            const newAnimal = {
-                                id: null, // Será atribuído depois
-                                nome,
-                                raca,
-                                categoria,
-                                peso,
-                                dataNasc,
-                                dataAquisicao: dataAquisicao || '',
-                                fotoBase64: '',
-                                statusReprodutivo: statusReprodutivo || (['Vaca', 'Novilha'].includes(categoria) ? 'Vazia' : 'N/A'),
-                                dataUltimoParto: dataUltimoParto || '',
-                                dataSecagem: dataSecagem || '',
-                                dataPrevisaoParto: dataPrevisaoParto || '',
-                            };
-                            importedAnimais.push(newAnimal);
-                        }
-                    });
-
-                    if (importedAnimais.length > 0) {
-                        showCustomConfirm(`ATENÇÃO: ${importedAnimais.length} animais serão adicionados ao rebanho. Deseja continuar?`, () => {
-                            importedAnimais.forEach(animal => {
-                                animal.id = rebanhoData.nextAnimalId++; // Atribui novo ID
-                                rebanhoData.animais.push(animal);
-                            });
-                            saveData();
-                            DOM.inputImportarCsv.value = '';
-                            showCustomAlert(`${importedAnimais.length} animais importados com sucesso!`);
-                        });
-                    } else {
-                        showCustomAlert('Nenhum animal válido encontrado no arquivo CSV.');
-                    }
-
-                } catch (error) {
-                    showCustomAlert('Erro ao processar o arquivo CSV: ' + error.message);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function resetAllData() {
-            showCustomConfirm('ATENÇÃO: Você tem certeza que deseja APAGAR TODOS os dados do rebanho?', () => {
-                rebanhoData = {
-                    animais: [],
-                    producaoLeite: [],
-                    tarefas: [],
-                    lactacoes: [],
-                    nextAnimalId: 1
-                };
-                localStorage.removeItem(STORAGE_KEY);
-                showCustomAlert('Todos os dados foram resetados.');
+        // Importa dados a partir de um JSON
+        function importDataFromJson(jsonString) {
+            try {
+                const newData = JSON.parse(jsonString);
                 
-                // Recarrega a aplicação
-                loadData();
-                showSection('dashboard');
-                window.location.reload(); 
-            });
+                // Validação básica para garantir a estrutura
+                if (!Array.isArray(newData.animais) || !Array.isArray(newData.producaoLeite)) {
+                    throw new Error("Estrutura de dados JSON inválida.");
+                }
+                
+                rebanhoData = newData;
+                // Garante que o nextAnimalId existe e é o maior ID + 1
+                const maxId = rebanhoData.animais.reduce((max, animal) => Math.max(max, animal.id), 0);
+                rebanhoData.nextAnimalId = maxId + 1;
+                
+                saveData();
+                showCustomAlert('Sucesso', 'Dados JSON importados e restaurados!', 'success');
+                DOM.inputImportarDados.value = ''; // Limpa o input
+                initialSetup(); // Re-inicializa a aplicação
+            } catch (error) {
+                console.error("Erro na importação JSON:", error);
+                showCustomAlert('Erro de Importação', `Falha ao importar o arquivo JSON: ${error.message}`, 'danger');
+            }
         }
         
+        // Exporta a lista de animais para CSV
         function exportToCsv() {
-             let csvContent = "ID;Nome;Raça;Categoria;Peso;DataNasc;DataAquisicao;StatusReprodutivo;DataUltimoParto;DataSecagem;DataPrevisaoParto\n";
-             
-             rebanhoData.animais.forEach(animal => {
-                 const linha = [
-                     formatAnimalId(animal.id),
-                     animal.nome,
-                     animal.raca,
-                     animal.categoria,
-                     animal.peso,
-                     animal.dataNasc,
-                     animal.dataAquisicao,
-                     animal.statusReprodutivo,
-                     animal.dataUltimoParto,
-                     animal.dataSecagem,
-                     animal.dataPrevisaoParto
-                 ].join(';');
-                 csvContent += linha + '\n';
-             });
-             
-             downloadFile(csvContent, `rebanho_animais_${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8;');
-             showCustomAlert('Animais exportados para CSV com sucesso!');
-        }
-        
-        function generateReportPdf() {
-            // Requer jspdf e jspdf-autotable
-            if (typeof jspdf === 'undefined' || typeof jsPDF.autoTable === 'undefined') {
-                 showCustomAlert('Erro: Bibliotecas de PDF não carregadas.');
+             const animais = rebanhoData.animais;
+             if (animais.length === 0) {
+                 showCustomAlert('Atenção', 'Não há animais para exportar.', 'warning');
                  return;
-            }
+             }
 
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
-            const pageHeight = doc.internal.pageSize.height;
-            let y = 15;
-            
-            doc.setFontSize(18);
-            doc.setTextColor('#28a745');
-            doc.text("Relatório do Rebanho Leiteiro", 15, y);
-            y += 10;
-            
-            // --- Resumo (Metrics) ---
-            doc.setFontSize(12);
-            doc.setTextColor(52, 58, 64);
-            doc.text(`Total de Animais: ${rebanhoData.animais.length}`, 15, y);
-            doc.text(`Vacas em Lactação: ${rebanhoData.animais.filter(a => a.categoria === 'Vaca' && a.statusReprodutivo === 'Em Lactação').length}`, 100, y);
-            y += 7;
-            doc.text(`Tarefas Pendentes: ${rebanhoData.tarefas.filter(t => !t.done).length}`, 15, y);
-            y += 10;
+             // Colunas: ID, Nome, Sexo, Raça, Categoria, Peso, DataNasc, DataAquisicao, StatusReprodutivo, DataUltimoParto, DataSecagem, DataPrevisaoParto
+             const header = ["ID","Nome","Sexo","Raça","Categoria","Peso","DataNasc","DataAquisicao","StatusReprodutivo","DataUltimoParto","DataSecagem","DataPrevisaoParto"];
+             
+             const csvContent = "data:text/csv;charset=utf-8," 
+                                + header.join(",") + "\n"
+                                + animais.map(a => 
+                                    [
+                                        formatAnimalId(a.id),
+                                        `"${(a.nome||'').replace(/"/g,'""')}"`,
+                                        a.sexo || '',
+                                        a.raca || '',
+                                        a.categoria || '',
+                                        a.peso || '',
+                                        a.dataNasc || '',
+                                        a.dataAquisicao || '',
+                                        a.statusReprodutivo || '',
+                                        a.dataUltimoParto || '',
+                                        a.dataSecagem || '',
+                                        a.dataPrevisaoParto || ''
+                                    ].join(",")
+                                ).join("\n");
 
-            // --- Tabela de Animais ---
-            doc.setFontSize(14);
-            doc.setTextColor('#007bff');
-            doc.text("Animais Cadastrados", 15, y);
-            y += 5;
-            
-            const animalHeaders = [["ID", "Nome", "Categoria", "Idade", "Status Repr."]];
-            const animalData = rebanhoData.animais.map(animal => [
-                formatAnimalId(animal.id),
-                animal.nome,
-                animal.categoria,
-                calculateAge(animal.dataNasc),
-                animal.statusReprodutivo || animal.categoria
-            ]);
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `animais_export_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link); 
+            link.click(); 
+            document.body.removeChild(link);
+            showCustomAlert('Sucesso', 'Lista de animais exportada para CSV!', 'success');
+        }
 
-            doc.autoTable({
-                startY: y,
-                head: animalHeaders,
-                body: animalData,
-                styles: { fontSize: 10, cellPadding: 2, overflow: 'linebreak' },
-                headStyles: { fillColor: [0, 123, 255] },
-                margin: { left: 15, right: 15 },
-                didDrawPage: function (data) {
-                    // Footer
-                    doc.setFontSize(10);
-                    doc.text('Página ' + doc.internal.getNumberOfPages(), data.settings.margin.left, pageHeight - 10);
-                }
+        // Função para importar CSV (Animais)
+     function importDataFromCsv(csvString) {
+             const lines = csvString.trim().split('\n');
+             if (lines.length <= 1) {
+                 showCustomAlert('Erro', 'O arquivo CSV está vazio ou tem apenas o cabeçalho.', 'danger');
+                 return;
+             }
+             
+             // Espera-se: ID, Nome, Sexo, Raça, Categoria, Peso, DataNasc, DataAquisicao, StatusReprodutivo, DataUltimoParto, DataSecagem, DataPrevisaoParto
+             const newAnimals = [];
+             let currentMaxId = rebanhoData.nextAnimalId - 1;
+
+             for (let i = 1; i < lines.length; i++) {
+                 const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, '')); // Remove aspas
+                 if (values.length < 12) continue; // Pula linhas incompletas
+
+                 // Tenta usar o ID do CSV, ou gera um novo (se o ID for inválido ou zero)
+                 let idFromCsv = parseInt(values[0].replace(/[^0-9]/g, ''));
+                 let animalId = isNaN(idFromCsv) || idFromCsv === 0 ? rebanhoData.nextAnimalId++ : idFromCsv;
+
+                 // Garante que o novo ID seja o maior se for importado com um ID maior que o nextAnimalId
+                 if (animalId >= rebanhoData.nextAnimalId) {
+                    rebanhoData.nextAnimalId = animalId + 1;
+                 } else if (animalId > currentMaxId) {
+                    currentMaxId = animalId;
+                 }
+
+                 newAnimals.push({
+                     id: animalId,
+                     nome: values[1] || `Anim${animalId}`,
+                     sexo: values[2] || 'Indefinido',
+                     raca: values[3] || '',
+                     categoria: values[4] || classifyCategory(values[6], values[2]), // tenta classificar pela dataNasc caso categoria vazia
+                     peso: parseFloat(values[5]) || 0,
+                     dataNasc: values[6] || '',
+                     dataAquisicao: values[7] || null,
+                     statusReprodutivo: values[8] || 'Vazia',
+                     dataUltimoParto: values[9] || null,
+                     dataSecagem: values[10] || null,
+                     dataPrevisaoParto: values[11] || null,
+                     fotoBase64: null,
+                     lactacoes: [] // Começa sem registros de lactação associados ao import CSV
+                 });
+             }
+             
+             // Adiciona novos animais, mas verifica duplicatas por nome (opcional, aqui apenas adiciona)
+             rebanhoData.animais = rebanhoData.animais.concat(newAnimals);
+             rebanhoData.nextAnimalId = rebanhoData.nextAnimalId > currentMaxId ? rebanhoData.nextAnimalId : currentMaxId + 1;
+             
+             saveData();
+             DOM.modalImportarCsv.style.display = 'none';
+             showCustomAlert('Sucesso', `${newAnimals.length} animais importados via CSV!`, 'success');
+             initialSetup();
+        }
+
+        // Reseta todos os dados
+        function resetAllData() {
+            showCustomConfirm('Confirmar Reset Total', 'Tem certeza que deseja apagar TODOS os dados da aplicação? Esta ação é IRREVERSÍVEL.', () => {
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem('idPrefix');
+                rebanhoData = { animais: [], producaoLeite: [], tarefas: [], lactacoes: [], nextAnimalId: 1 };
+                initialSetup();
+                showCustomAlert('Reset Concluído', 'Todos os dados foram apagados. A aplicação foi resetada.', 'success');
+            }, () => {
+                showCustomAlert('Cancelado', 'O reset de dados foi cancelado.', 'info');
             });
-            
-            y = doc.autoTable.previous.finalY + 10;
-            
-            // --- Tabela de Tarefas Pendentes ---
-            doc.setFontSize(14);
-            doc.setTextColor('#ffc107');
-            doc.text("Tarefas Pendentes", 15, y);
-            y += 5;
-            
-            const tarefaHeaders = [["Data", "Animal", "Tipo", "Descrição"]];
-            const tarefaData = rebanhoData.tarefas
-                .filter(t => !t.done)
-                .sort((a, b) => new Date(a.data) - new Date(b.data))
-                .map(tarefa => {
-                    const animal = rebanhoData.animais.find(a => a.id === tarefa.animalId);
-                    const animalNome = animal ? `${formatAnimalId(animal.id)} - ${animal.nome}` : 'Animal Excluído';
-                    return [
-                        new Date(tarefa.data).toLocaleDateString(),
-                        animalNome,
-                        tarefa.tipo,
-                        tarefa.descricao
-                    ];
+        }
+        
+        // --- Setup Inicial ---
+
+        function setupEventListeners() {
+            // Navegação
+            DOM.navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showSection(link.getAttribute('data-section'));
                 });
-
-             doc.autoTable({
-                startY: y,
-                head: tarefaHeaders,
-                body: tarefaData,
-                styles: { fontSize: 10, cellPadding: 2, overflow: 'linebreak' },
-                headStyles: { fillColor: [255, 193, 7] },
-                margin: { left: 15, right: 15 },
-                didDrawPage: function (data) {
-                    // Footer
-                    doc.setFontSize(10);
-                    doc.text('Página ' + doc.internal.getNumberOfPages(), data.settings.margin.left, pageHeight - 10);
-                }
-            });
-
-            doc.save(`Relatorio_Rebanho_${new Date().toISOString().split('T')[0]}.pdf`);
-            showCustomAlert('Relatório PDF gerado com sucesso!');
-        }
-
-
-        // --- Funções de Modal (Alerta/Confirmação Customizados) ---
-        
-        // CORREÇÃO: Estas funções foram ajustadas para garantir que usem document.body e tenham verificações de nulidade para evitar o erro 'Cannot read properties of null (reading 'prepend')'.
-
-        function showCustomAlert(message) {
-            // Remove qualquer alerta existente
-            const existingAlert = document.querySelector('.custom-alert-overlay');
-            if (existingAlert) existingAlert.remove();
-
-            const overlay = document.createElement('div');
-            overlay.className = 'custom-alert-overlay';
-            
-            const alertBox = document.createElement('div');
-            alertBox.className = 'custom-alert-box';
-            
-            alertBox.innerHTML = `
-                <div class="custom-alert-icon"><i class="ph ph-bell-ringing"></i></div>
-                <div class="custom-alert-message">${message}</div>
-                <div class="custom-alert-actions">
-                    <button class="btn btn-primary" id="custom-alert-ok-btn">OK</button>
-                </div>
-            `;
-            
-            alertBox.querySelector('#custom-alert-ok-btn').addEventListener('click', () => {
-                overlay.classList.remove('show');
-                setTimeout(() => overlay.remove(), 300);
             });
             
-            overlay.appendChild(alertBox);
-
-            const container = document.body;
-            if (container) {
-                container.prepend(overlay);
-                setTimeout(() => overlay.classList.add('show'), 10); // Adiciona a classe show após o prepend
-            } else {
-                 console.error("Erro: document.body não encontrado para prepend.");
-            }
-        }
-
-        function showCustomConfirm(message, onConfirm) {
-            // Remove qualquer alerta existente
-            const existingAlert = document.querySelector('.custom-alert-overlay');
-            if (existingAlert) existingAlert.remove();
+            if (DOM.animalDataNascInput) DOM.animalDataNascInput.addEventListener('change', updateCategoryFromDobSex);
+            if (DOM.animalSexoSelect) DOM.animalSexoSelect.addEventListener('change', updateCategoryFromDobSex);
             
-            const overlay = document.createElement('div');
-            overlay.className = 'custom-alert-overlay';
-            
-            const alertBox = document.createElement('div');
-            alertBox.className = 'custom-alert-box confirm';
-            
-            alertBox.innerHTML = `
-                <div class="custom-alert-icon"><i class="ph ph-warning"></i></div>
-                <div class="custom-alert-message">${message}</div>
-                <div class="custom-alert-actions">
-                    <button class="btn btn-danger" id="custom-confirm-yes-btn">Sim</button>
-                    <button class="btn btn-secondary" id="custom-confirm-no-btn">Não</button>
-                </div>
-            `;
-            
-            const close = () => {
-                overlay.classList.remove('show');
-                setTimeout(() => overlay.remove(), 300);
-            };
-            
-            alertBox.querySelector('#custom-confirm-yes-btn').addEventListener('click', () => {
-                onConfirm();
-                close();
-            });
-            
-            alertBox.querySelector('#custom-confirm-no-btn').addEventListener('click', close);
-            
-            overlay.appendChild(alertBox);
-
-            const container = document.body;
-            if (container) {
-                container.prepend(overlay);
-                setTimeout(() => overlay.classList.add('show'), 10);
-            } else {
-                 console.error("Erro: document.body não encontrado para prepend.");
-            }
-        }
-
-
-        // --- Listeners de Eventos ---
-        
-        // Navegação
-        DOM.navLinks.forEach(link => {
-            link.addEventListener('click', (event) => {
-                event.preventDefault();
-                showSection(link.dataset.section);
-            });
-        });
-
-        // Formulários
-        if (DOM.animalForm) {
+            // Formulários
             DOM.animalForm.addEventListener('submit', saveAnimal);
-        }
-        if (DOM.leiteForm) {
-            DOM.leiteForm.addEventListener('submit', saveLeiteRegistro);
-        }
-        if (DOM.tarefaForm) {
+            DOM.leiteForm.addEventListener('submit', saveLeite);
             DOM.tarefaForm.addEventListener('submit', saveTarefa);
-        }
-        
-        // Filtros e Busca de Animais
-        if (DOM.filtroCategoriaSelect) {
-            DOM.filtroCategoriaSelect.addEventListener('change', renderAnimalList);
-        }
-        if (DOM.buscaAnimalInput) {
-            DOM.buscaAnimalInput.addEventListener('input', renderAnimalList);
-        }
-
-        // Configurações e Ações Globais
-        if (DOM.idPrefixForm) {
-            DOM.idPrefixForm.addEventListener('submit', (event) => {
-                event.preventDefault(); // Evita o envio do formulário
-                const newPrefix = DOM.idPrefixInput.value.toUpperCase();
-                if (newPrefix.length > 0 && newPrefix.length <= 5) {
-                    localStorage.setItem('idPrefix', newPrefix);
-                    DOM.currentIdPrefix.textContent = newPrefix;
-                    showCustomAlert(`Prefixo de ID salvo como: ${newPrefix}`);
-                    renderAnimalList(); // Re-renderiza para mostrar os IDs atualizados
+            DOM.idPrefixForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const prefix = DOM.idPrefixInput.value.trim().toUpperCase();
+                if (prefix.length >= 1 && prefix.length <= 5) {
+                    localStorage.setItem('idPrefix', prefix);
+                    DOM.currentIdPrefix.textContent = prefix;
+                    showCustomAlert('Sucesso', `Prefixo de ID alterado para ${prefix}.`, 'success');
+                    renderAnimalList(); // Atualiza a lista para refletir o novo formato
                 } else {
-                    showCustomAlert('O prefixo deve ter entre 1 e 5 caracteres.');
+                    showCustomAlert('Erro', 'O prefixo deve ter entre 1 e 5 letras.', 'danger');
                 }
             });
-        }
-        
-        // Exibe/Oculta campos condicionais do formulário de Animal
-        if (DOM.animalCategoriaSelect && DOM.vacaFields) {
-            DOM.animalCategoriaSelect.addEventListener('change', () => {
-                const categoria = DOM.animalCategoriaSelect.value;
-                DOM.vacaFields.style.display = (categoria === 'Vaca' || categoria === 'Novilha') ? 'block' : 'none';
-            });
-        }
-        
-        // Visualização do Animal - Tabs
-        if (DOM.animalViewTabsContainer) {
-            DOM.animalViewTabsContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('animal-view-tab-btn')) {
-                    document.querySelectorAll('#animal-view-tabs button').forEach(btn => btn.classList.remove('active'));
-                    document.querySelectorAll('#modal-animal-view .animal-view-tab-content').forEach(content => content.style.display = 'none');
-                    
-                    e.target.classList.add('active');
-                    const tabId = e.target.dataset.tab;
-                    const tabContent = document.getElementById(tabId);
-                    if (tabContent) {
-                        tabContent.style.display = 'block';
-                    }
-                }
-            });
-        }
 
-        // Importação de Dados
-        if (DOM.btnImportarDadosModal) {
-            DOM.btnImportarDadosModal.addEventListener('click', () => {
-                 DOM.modalAnimalForm.style.display = 'none'; // Fecha o de animal se estiver aberto
-                 document.getElementById('modal-importar-csv').style.display='none';
-                 
-                 // Abrir o modal de importação JSON (que na verdade usa o input na seção de config)
-                 showSection('config'); // Leva para a seção de config onde está o input
-            });
-        }
-        
-        if (DOM.inputImportarDados) {
-            DOM.inputImportarDados.addEventListener('change', (event) => {
-                if (DOM.btnImportarDados) {
-                    DOM.btnImportarDados.disabled = event.target.files.length === 0;
-                }
-            });
-        }
-        if (DOM.btnImportarDados) {
-            DOM.btnImportarDados.addEventListener('click', importDataFromJson);
-        }
-        
-        if (DOM.btnImportarCsvModal) {
-            DOM.btnImportarCsvModal.addEventListener('click', () => {
-                DOM.modalImportarCsv.style.display = 'flex';
-            });
-        }
-        if (DOM.inputImportarCsv) {
-            DOM.inputImportarCsv.addEventListener('change', (event) => {
-                if (DOM.btnImportarCsv) {
-                     DOM.btnImportarCsv.disabled = event.target.files.length === 0;
-                }
-            });
-        }
-        if (DOM.btnImportarCsv) {
-            DOM.btnImportarCsv.addEventListener('click', importDataFromCsv);
-        }
-        
-        // Botões de Ação Global
-        if (DOM.btnExportarJson) {
+            // Filtros da Lista de Animais
+            DOM.filtroCategoriaSelect.addEventListener('change', renderAnimalList);
+            DOM.buscaAnimalInput.addEventListener('input', renderAnimalList);
+            
+            // Botões de Ação
+            DOM.resetDataBtn.addEventListener('click', resetAllData);
             DOM.btnExportarJson.addEventListener('click', exportDataToJson);
-        }
-        if (DOM.btnExportarCsv) {
             DOM.btnExportarCsv.addEventListener('click', exportToCsv);
-        }
-        if (DOM.btnGerarRelatorioPdf) {
-            DOM.btnGerarRelatorioPdf.addEventListener('click', generateReportPdf);
-        }
-        
-        // Listener de Reset (CORRIGIDO com verificação de nulidade)
-        const resetBtn = document.getElementById('reset-data-btn');
-        if (resetBtn) {
-            resetBtn.addEventListener('click', resetAllData);
+            DOM.btnImportarDados.addEventListener('click', () => {
+                const file = DOM.inputImportarDados.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => importDataFromJson(e.target.result);
+                    reader.readAsText(file);
+                } else {
+                    showCustomAlert('Erro', 'Selecione um arquivo JSON para importar.', 'danger');
+                }
+            });
+            DOM.inputImportarDados.addEventListener('change', () => {
+                DOM.btnImportarDados.disabled = !DOM.inputImportarDados.files.length;
+            });
+            
+            // Câmera
+            DOM.btnTirarFoto.addEventListener('click', tirarFoto);
+            DOM.btnCancelarCamera.addEventListener('click', cancelarCaptura);
+            
+            // Ações do Modal de Visualização
+            DOM.btnEditView.addEventListener('click', (e) => openAnimalForm(parseInt(e.currentTarget.dataset.animalId)));
+            DOM.btnDeleteView.addEventListener('click', (e) => deleteAnimal(parseInt(e.currentTarget.dataset.animalId)));
+
+            // Modais de Importação
+            DOM.btnImportarDadosModal.addEventListener('click', () => {
+                 showSection('config'); // Vai para a seção de config
+                 // Não abre modal, pois o input está diretamente na seção
+            });
+            
+            DOM.btnImportarCsvModal.addEventListener('click', () => {
+                 DOM.modalImportarCsv.style.display = 'flex';
+                 DOM.inputImportarCsv.value = '';
+                 DOM.btnImportarCsv.disabled = true;
+            });
+
+            DOM.inputImportarCsv.addEventListener('change', () => {
+                 DOM.btnImportarCsv.disabled = !DOM.inputImportarCsv.files.length;
+            });
+            
+            DOM.btnImportarCsv.addEventListener('click', () => {
+                const file = DOM.inputImportarCsv.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => importDataFromCsv(e.target.result);
+                    reader.readAsText(file);
+                }
+            });
+
+            // NOVO: Lógica para o novo modal de relatórios
+            DOM.btnAbrirModalRelatorio.addEventListener('click', () => {
+                DOM.modalRelatoriosPdf.style.display = 'flex';
+                // Limpar filtros e selecionar o primeiro item ao abrir
+                DOM.formRelatorioPdf.reset();
+                DOM.tipoRelatorioSelect.value = ''; // Garante que o select 'Selecione o Tipo...' está ativo
+                toggleRelatorioFilters();
+            });
+
+            DOM.formRelatorioPdf.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const tipo = DOM.tipoRelatorioSelect.value;
+                if (!tipo) {
+                    showCustomAlert('Erro', 'Por favor, selecione um tipo de relatório.', 'warning');
+                    return;
+                }
+                const filtros = collectRelatorioFilters(tipo);
+                DOM.modalRelatoriosPdf.style.display = 'none';
+                generateReportPdf(tipo, filtros);
+            });
         }
 
-        // Inicialização da Aplicação
-        window.onload = function() {
+        function initialSetup() {
             loadData();
-            initCharts();
-            populateSelects(); // Preenche os selects após carregar os dados
-            renderAnimalList(); // Garante que a lista de animais seja renderizada
-
-            // Verifica a seção na URL e exibe, ou vai para o Dashboard
-            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'dashboard';
-            showSection(initialSection);
-
-            // Inicializa data da tarefa e leite
-            const today = new Date().toISOString().split('T')[0];
-            if (DOM.leiteDataInput) DOM.leiteDataInput.value = today;
-            if (DOM.tarefaData) DOM.tarefaData.value = today;
+            setupEventListeners();
+            
+            // Configurações iniciais de UI
+            showSection('dashboard');
+            DOM.currentIdPrefix.textContent = localStorage.getItem('idPrefix') || 'ID';
+            DOM.leiteDataInput.value = new Date().toISOString().split('T')[0];
+            DOM.tarefaData.value = new Date().toISOString().split('T')[0];
             
             // Corrige o bug de campos de reprodução ao carregar o form para novo animal
              if (DOM.animalCategoriaSelect && DOM.vacaFields) {
                 const categoria = DOM.animalCategoriaSelect.value;
                 DOM.vacaFields.style.display = (categoria === 'Vaca' || categoria === 'Novilha') ? 'block' : 'none';
             }
+            
+            updateAllSelectors();
+            renderAnimalList();
+            renderLeiteList();
+            renderTarefaList();
+            updateDashboard();
         };
+
+        // Chama a função principal para iniciar a aplicação
+        window.onload = initialSetup;
 
         // Exposição de funções globais para handlers inline no HTML (necessário)
         window.viewAnimal = viewAnimal;
@@ -2774,17 +3176,30 @@
         window.showCustomAlert = showCustomAlert;
         window.showCustomConfirm = showCustomConfirm;
         window.exportDataToJson = exportDataToJson;
-        window.importDataFromJson = importDataFromJson; // Chamado pelo listener
-        window.importDataFromCsv = importDataFromCsv; // Chamado pelo listener
+        window.importDataFromJson = importDataFromJson; 
+        window.importDataFromCsv = importDataFromCsv; 
         window.resetAllData = resetAllData;
-        window.generateReportPdf = generateReportPdf;
+        
+        // NOVO: Exposição das funções de relatório e utilitários
+        window.generateReportPdf = generateReportPdf; // Substituído
         window.exportToCsv = exportToCsv;
         window.markTarefaAsDone = markTarefaAsDone;
         window.deleteTarefa = deleteTarefa;
         window.deleteLeiteRegistro = deleteLeiteRegistro;
         window.deleteLactacaoRegistro = deleteLactacaoRegistro;
+        window.toggleRelatorioFilters = toggleRelatorioFilters; // NOVO
         
-    </script>
+        // Função utilitária para calcular a diferença de dias entre duas datas (melhoria)
+        function calculateDaysInMilk(startDate, endDate = null) {
+            if (!startDate) return 0;
+            const start = new Date(startDate + "T00:00:00");
+            const end = endDate ? new Date(endDate + "T00:00:00") : new Date();
 
+            if (start > end) return 0;
+            const diffTime = Math.abs(end.getTime() - start.getTime());
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+    </script>
 </body>
 </html>
